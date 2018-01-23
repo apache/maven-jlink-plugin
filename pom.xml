@@ -68,13 +68,14 @@
     <mavenVersion>3.0</mavenVersion>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.plugin.tools.version>3.5.1</maven.plugin.tools.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.5</version>
+      <version>${maven.plugin.tools.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- Maven -->
@@ -155,7 +156,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.5</version>
+          <version>${maven.plugin.tools.version}</version>
         </plugin>
 
         <plugin>
@@ -193,7 +194,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.5</version>
+        <version>${maven.plugin.tools.version}</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
