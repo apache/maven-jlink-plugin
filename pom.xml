@@ -65,6 +65,7 @@
   </distributionManagement>
 
   <properties>
+    <surefire.version>2.21.0</surefire.version>
     <mavenVersion>3.0</mavenVersion>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
