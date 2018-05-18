@@ -93,6 +93,14 @@ public class JLinkMojo
     private Integer compress;
 
     /**
+     * Should the plugin generate a launcher script by means of jlink? The command line equivalent is:
+     * <code>--launcher &lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>. The valid values for the level are:
+     * <code>&lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>.
+     */
+    @Parameter
+    private String launcher;
+
+    /**
      * Limit the universe of observable modules. The following gives an example of the configuration which can be used
      * in the <code>pom.xml</code> file.
      * 
@@ -495,6 +503,11 @@ public class JLinkMojo
         {
             argsFile.println( "--compress" );
             argsFile.println( compress );
+        }
+        if ( launcher != null )
+        {
+            argsFile.println( "--launcher" );
+            argsFile.println( launcher );
         }
 
         if ( disablePlugin != null )
