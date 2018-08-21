@@ -35,7 +35,7 @@ import org.mockito.Mockito;
 /**
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
-public class AbsractJLinkMojoTest
+public class AbstractJLinkMojoTest
 {
     private AbstractJLinkMojo mojoMock;
 
