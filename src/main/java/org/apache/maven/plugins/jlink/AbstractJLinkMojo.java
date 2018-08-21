@@ -159,10 +159,15 @@ public abstract class AbstractJLinkMojo
 
             if ( exitCode != 0 )
             {
+
                 if ( StringUtils.isNotEmpty( output ) )
                 {
                     // Reconsider to use WARN / ERROR ?
-                    getLog().error( output );
+                   //  getLog().error( output );
+                    for ( String outputLine : output.split( "\n" ) )
+                    {
+                        getLog().error( outputLine );
+                    }
                 }
 
                 StringBuilder msg = new StringBuilder( "\nExit code: " );
@@ -179,7 +184,11 @@ public abstract class AbstractJLinkMojo
 
             if ( StringUtils.isNotEmpty( output ) )
             {
-                getLog().info( output );
+                //getLog().info( output );
+                for ( String outputLine : output.split( "\n" ) )
+                {
+                    getLog().info( outputLine );
+                }
             }
         }
         catch ( CommandLineException e )
