@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -158,6 +159,9 @@ public class JLinkMojo
     private File outputDirectoryImage;
 
     @Parameter( defaultValue = "${project.build.directory}", required = true, readonly = true )
+    private File buildDirectory;
+
+    @Parameter( defaultValue = "${project.build.outputDirectory}", required = true, readonly = true )
     private File outputDirectory;
 
     /**
@@ -169,8 +173,8 @@ public class JLinkMojo
     private String endian;
 
     /**
-     * Include additional paths on the <code>--module-path</code> option.
-     * Project dedependencies and JDK modules are automatically added.
+     * Include additional paths on the <code>--module-path</code> option. Project dedependencies and JDK modules are
+     * automatically added.
      */
     @Parameter
     private List<String> modulePaths;
@@ -237,8 +241,8 @@ public class JLinkMojo
     private ZipArchiver zipArchiver;
 
     /**
-     * Name of the generated ZIP file in the <code>target</code> directory. 
-     * This will not change the name of the installed/deployed file.
+     * Name of the generated ZIP file in the <code>target</code> directory. This will not change the name of the
+     * installed/deployed file.
      */
     @Parameter( defaultValue = "${project.build.finalName}", readonly = true )
     private String finalName;
@@ -265,26 +269,18 @@ public class JLinkMojo
 
         ifOutputDirectoryExistsDelteIt();
 
-        Collection<String> modulesToAdd;
-        if ( addModules == null )
+        Collection<String> modulesToAdd = new ArrayList<>();
+        if ( addModules != null )
         {
-            modulesToAdd = new ArrayList<>();
+            modulesToAdd.addAll( addModules );
         }
-        else
+
+        Collection<String> pathsOfModules = new ArrayList<>();
+        if ( modulePaths != null )
         {
-            modulesToAdd = new ArrayList<>( addModules );
+            pathsOfModules.addAll( modulePaths );
         }
-        
-        Collection<String> pathsOfModules;
-        if ( modulePaths == null )
-        {
-            pathsOfModules = new ArrayList<>();
-        }
-        else
-        {
-            pathsOfModules = new ArrayList<>( modulePaths );
-        }
-        
+
         for ( Entry<String, File> item : getModulePathElements().entrySet() )
         {
             getLog().info( " -> module: " + item.getKey() + " ( " + item.getValue().getPath() + " )" );
@@ -293,6 +289,7 @@ public class JLinkMojo
             modulesToAdd.add( item.getKey() );
             pathsOfModules.add( item.getValue().getPath() );
         }
+
         // The jmods directory of the JDK
         pathsOfModules.add( jmodsFolder.getAbsolutePath() );
 
@@ -309,7 +306,7 @@ public class JLinkMojo
 
         executeCommand( cmd, outputDirectoryImage );
 
-        File createZipArchiveFromImage = createZipArchiveFromImage( outputDirectory, outputDirectoryImage );
+        File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
 
         if ( projectHasAlreadySetAnArtifact() )
         {
@@ -326,24 +323,26 @@ public class JLinkMojo
 
         for ( Artifact a : project.getArtifacts() )
         {
+            getLog().debug( "Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion() );
             list.add( a.getFile() );
         }
         return list;
     }
 
-    private Map<String, File> getModulePathElements() throws MojoFailureException
+    private Map<String, File> getModulePathElements()
+        throws MojoFailureException
     {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
         // and we can detect if auto modules are used. In that case, MavenProject.setFile() should not be used, so
         // you cannot depend on this project and so it won't be distributed.
 
         Map<String, File> modulepathElements = new HashMap<>();
-        
+
         try
         {
             Collection<File> dependencyArtifacts = getCompileClasspathElements( getProject() );
 
-            ResolvePathsRequest<File> request = ResolvePathsRequest.withFiles( dependencyArtifacts );
+            ResolvePathsRequest<File> request = ResolvePathsRequest.ofFiles( dependencyArtifacts );
 
             Toolchain toolchain = getToolchain();
             if ( toolchain != null && toolchain instanceof DefaultJavaToolChain )
@@ -355,25 +354,49 @@ public class JLinkMojo
 
             for ( Map.Entry<File, JavaModuleDescriptor> entry : resolvePathsResult.getPathElements().entrySet() )
             {
-                if ( entry.getValue() != null )
-                {
-                    // Don't warn for automatic modules, let the jlink tool do that
-                    modulepathElements.put( entry.getValue().name(), entry.getKey() );
-                }
-                else
+                if ( entry.getValue() == null )
                 {
                     String message = "The given dependency " + entry.getKey()
                         + " does not have a module-info.java file. So it can't be linked.";
                     getLog().error( message );
                     throw new MojoFailureException( message );
                 }
+
+                // Don't warn for automatic modules, let the jlink tool do that
+                getLog().debug( " module: " + entry.getValue().name() + " automatic: "
+                    + entry.getValue().isAutomatic() );
+                modulepathElements.put( entry.getValue().name(), entry.getKey() );
             }
-        }
+
+            // This part is for the module in target/classes ? (Hacky..)
+            // FIXME: Is there a better way to identify that code exists?
+            if ( outputDirectory.exists() )
+            {
+                List<File> singletonList = Collections.singletonList( outputDirectory );
+
+                ResolvePathsRequest<File> singleModuls = ResolvePathsRequest.ofFiles( singletonList );
+
+                ResolvePathsResult<File> resolvePaths = locationManager.resolvePaths( singleModuls );
+                for ( Entry<File, JavaModuleDescriptor> entry : resolvePaths.getPathElements().entrySet() )
+                {
+                    if ( entry.getValue() == null )
+                    {
+                        String message = "The given project " + entry.getKey()
+                            + " does not contain a module-info.java file. So it can't be linked.";
+                        getLog().error( message );
+                        throw new MojoFailureException( message );
+                    }
+                    modulepathElements.put( entry.getValue().name(), entry.getKey() );
+                }
+            }
+
+        }   
         catch ( IOException e )
         {
-            getLog().warn( e.getMessage() );
+            getLog().error( e.getMessage() );
+            throw new MojoFailureException( e.getMessage() );
         }
-        
+
         return modulepathElements;
     }
 
@@ -436,8 +459,7 @@ public class JLinkMojo
     {
         if ( compress != null && ( compress < 0 || compress > 2 ) )
         {
-            String message =
-                "The given compress parameters " + compress + " is not in the valid value range from 0..2";
+            String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
             getLog().error( message );
             throw new MojoFailureException( message );
         }
@@ -523,14 +545,12 @@ public class JLinkMojo
         }
         if ( pathsOfModules != null )
         {
-            //@formatter:off
+            // @formatter:off
             argsFile.println( "--module-path" );
-            argsFile
-              .append( '"' )
-              .append( getPlatformDependSeparateList( pathsOfModules )
-                         .replace( "\\", "\\\\" ) 
-                     ).println( '"' );
-            //@formatter:off
+            argsFile.append( '"' )
+                .append( getPlatformDependSeparateList( pathsOfModules )
+                         .replace( "\\", "\\\\" ) ).println( '"' );
+            // @formatter:off
         }
 
         if ( noHeaderFiles )
@@ -573,7 +593,7 @@ public class JLinkMojo
             argsFile.append( '"' ).append( sb.toString().replace( "\\", "\\\\" ) ).println( '"' );
         }
 
-        if ( outputDirectory != null )
+        if ( buildDirectory != null )
         {
             argsFile.println( "--output" );
             argsFile.println( outputDirectoryImage );
