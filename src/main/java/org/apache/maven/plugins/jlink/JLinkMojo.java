@@ -365,6 +365,10 @@ public class JLinkMojo
                 // Don't warn for automatic modules, let the jlink tool do that
                 getLog().debug( " module: " + entry.getValue().name() + " automatic: "
                     + entry.getValue().isAutomatic() );
+                if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                {
+                    getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                }
                 modulepathElements.put( entry.getValue().name(), entry.getKey() );
             }
 
@@ -385,6 +389,10 @@ public class JLinkMojo
                             + " does not contain a module-info.java file. So it can't be linked.";
                         getLog().error( message );
                         throw new MojoFailureException( message );
+                    }
+                    if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                    {
+                        getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
                     }
                     modulepathElements.put( entry.getValue().name(), entry.getKey() );
                 }
