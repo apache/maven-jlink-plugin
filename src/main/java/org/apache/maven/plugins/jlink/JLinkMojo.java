@@ -241,6 +241,12 @@ public class JLinkMojo
     private ZipArchiver zipArchiver;
 
     /**
+     * Set the JDK location to create a Java custom runtime image.
+     */
+    @Parameter
+    private File sourceJdkModules;
+
+    /**
      * Name of the generated ZIP file in the <code>target</code> directory. This will not change the name of the
      * installed/deployed file.
      */
@@ -260,7 +266,15 @@ public class JLinkMojo
 
         // Really Hacky...do we have a better solution to find the jmods directory of the JDK?
         File jLinkParent = jLinkExecuteable.getParentFile().getParentFile();
-        File jmodsFolder = new File( jLinkParent, JMODS );
+        File jmodsFolder;
+        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
+        {
+            jmodsFolder = new File ( sourceJdkModules, JMODS );
+        }
+        else
+        {
+            jmodsFolder = new File( jLinkParent, JMODS );
+        }
 
         getLog().debug( " Parent: " + jLinkParent.getAbsolutePath() );
         getLog().debug( " jmodsFolder: " + jmodsFolder.getAbsolutePath() );
