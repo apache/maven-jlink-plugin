@@ -109,25 +109,4 @@ public class AbstractJLinkMojoTest
         assertThat( result ).isEqualTo( "A,B" );
     }
 
-//    @Test
-//    public void xxx()
-//        throws MojoExecutionException, IOException, CommandLineException
-//    {
-//        Process p = mock( Process.class );
-//
-//        String b = "Error occured";
-//        byte[] bytes = b.getBytes();
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        baos.write( bytes );
-//        
-//        when (p.getOutputStream()).thenReturn( baos );
-//        
-//        Commandline cmd = mock( Commandline.class );
-//        when (cmd.execute()).thenReturn( p );
-//        
-//        File outputDirectory = mock( File.class );
-//
-//        mojoMock.executeCommand( cmd, outputDirectory );
-//
-//    }
 }

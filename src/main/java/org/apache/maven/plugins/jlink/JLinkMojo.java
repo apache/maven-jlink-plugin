@@ -389,7 +389,8 @@ public class JLinkMojo
 
             for ( Map.Entry<File, JavaModuleDescriptor> entry : resolvePathsResult.getPathElements().entrySet() )
             {
-                if ( entry.getValue() == null )
+                JavaModuleDescriptor value = entry.getValue();
+                if ( value == null )
                 {
                     String message = "The given dependency " + entry.getKey()
                         + " does not have a module-info.java file. So it can't be linked.";
@@ -398,13 +399,12 @@ public class JLinkMojo
                 }
 
                 // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug( " module: " + entry.getValue().name() + " automatic: "
-                    + entry.getValue().isAutomatic() );
-                if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                getLog().debug(" module: " + value.name() + " automatic: " + value.isAutomatic());
+                if ( modulepathElements.containsKey( value.name() ) )
                 {
-                    getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                    getLog().warn( "The module name " + value.name() + " does already exists." );
                 }
-                modulepathElements.put( entry.getValue().name(), entry.getKey() );
+                modulepathElements.put( value.name(), entry.getKey() );
             }
 
             // This part is for the module in target/classes ? (Hacky..)
@@ -418,18 +418,19 @@ public class JLinkMojo
                 ResolvePathsResult<File> resolvePaths = locationManager.resolvePaths( singleModuls );
                 for ( Entry<File, JavaModuleDescriptor> entry : resolvePaths.getPathElements().entrySet() )
                 {
-                    if ( entry.getValue() == null )
+                    JavaModuleDescriptor value = entry.getValue();
+                    if ( value == null )
                     {
                         String message = "The given project " + entry.getKey()
                             + " does not contain a module-info.java file. So it can't be linked.";
                         getLog().error( message );
                         throw new MojoFailureException( message );
                     }
-                    if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                    if ( modulepathElements.containsKey( value.name() ) )
                     {
-                        getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                        getLog().warn( "The module name " + value.name() + " does already exists." );
                     }
-                    modulepathElements.put( entry.getValue().name(), entry.getKey() );
+                    modulepathElements.put( value.name(), entry.getKey() );
                 }
             }
 
