@@ -143,6 +143,9 @@ public class JLinkMojo
     @Parameter
     private List<String> addModules;
 
+    @Parameter
+    private List<String> excludeModules;
+
     /**
      * Define the plugin module path to be used. There can be defined multiple entries separated by either {@code ;} or
      * {@code :}. The jlink command line equivalent is: <code>--plugin-module-path &lt;modulepath&gt;</code>
@@ -297,6 +300,10 @@ public class JLinkMojo
 
         for ( Entry<String, File> item : getModulePathElements().entrySet() )
         {
+            if ( excludeModules.contains( item.getKey()  ) )
+            {
+                continue;
+            }
             getLog().info( " -> module: " + item.getKey() + " ( " + item.getValue().getPath() + " )" );
 
             // We use the real module name and not the artifact Id...
