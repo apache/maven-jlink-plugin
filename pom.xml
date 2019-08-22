@@ -29,7 +29,8 @@
     <relativePath>../maven-plugins/pom.xml</relativePath>
   </parent>
 
-  <artifactId>maven-jlink-plugin</artifactId>
+  <groupId>org.mal-lang</groupId>
+  <artifactId>jlink-maven-plugin</artifactId>
   <version>3.0.0-alpha-2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
@@ -37,34 +38,20 @@
   <description>The Maven JLink Plugin is intended to create Modular Run-Time Images.
    http://openjdk.java.net/jeps/282, http://openjdk.java.net/jeps/220</description>
   <inceptionYear>2016</inceptionYear>
+  <url>https://github.com/mal-lang/maven-jlink-plugin/</url>
 
   <prerequisites>
     <maven>${mavenVersion}</maven>
   </prerequisites>
 
   <scm>
-    <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</connection>
-    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</developerConnection>
-    <url>https://github.com/apache/maven-jlink-plugin/tree/${project.scm.tag}</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:git://github.com/mal-lang/maven-jlink-plugin.git</connection>
+    <developerConnection>scm:git:ssh://github.com:mal-lang/maven-jlink-plugin.git</developerConnection>
+    <url>https://github.com/mal-lang/maven-jlink-plugin/tree/master</url>
   </scm>
 
-  <issueManagement>
-    <system>jira</system>
-    <url>https://issues.apache.org/jira/browse/MJLINK</url>
-  </issueManagement>
-  <ciManagement>
-    <system>Jenkins</system>
-    <url>https://builds.apache.org/job/maven-box/job/maven-jlink-plugin/</url>
-  </ciManagement>
-  <distributionManagement>
-    <site>
-      <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
-    </site>
-  </distributionManagement>
-
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mavenVersion>3.0</mavenVersion>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
@@ -159,6 +146,39 @@
         <filtering>true</filtering>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.1.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <reporting>
