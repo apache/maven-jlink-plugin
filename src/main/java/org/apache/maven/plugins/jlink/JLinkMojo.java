@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -55,7 +56,7 @@ import org.codehaus.plexus.util.cli.Commandline;
  * The JLink goal is intended to create a Java Run Time Image file based on
  * <a href="http://openjdk.java.net/jeps/282">http://openjdk.java.net/jeps/282</a>,
  * <a href="http://openjdk.java.net/jeps/220">http://openjdk.java.net/jeps/220</a>.
- * 
+ *
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
 // CHECKSTYLE_OFF: LineLength
@@ -104,7 +105,7 @@ public class JLinkMojo
     /**
      * Limit the universe of observable modules. The following gives an example of the configuration which can be used
      * in the <code>pom.xml</code> file.
-     * 
+     *
      * <pre>
      *   &lt;limitModules&gt;
      *     &lt;limitModule&gt;mod1&lt;/limitModule&gt;
@@ -113,7 +114,7 @@ public class JLinkMojo
      *     .
      *   &lt;/limitModules&gt;
      * </pre>
-     * 
+     *
      * This configuration is the equivalent of the command line option:
      * <code>--limit-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>
      */
@@ -128,7 +129,7 @@ public class JLinkMojo
      * By using the --add-modules you can define the root modules to be resolved. The configuration in
      * <code>pom.xml</code> file can look like this:
      * </p>
-     * 
+     *
      * <pre>
      * &lt;addModules&gt;
      *   &lt;addModule&gt;mod1&lt;/addModule&gt;
@@ -137,7 +138,7 @@ public class JLinkMojo
      *   .
      * &lt;/addModules&gt;
      * </pre>
-     * 
+     *
      * The command line equivalent for jlink is: <code>--add-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>.
      */
     @Parameter
@@ -213,7 +214,7 @@ public class JLinkMojo
 
     /**
      * Suggest providers that implement the given service types from the module path.
-     * 
+     *
      * <pre>
      * &lt;suggestProviders&gt;
      *   &lt;suggestProvider&gt;name-a&lt;/suggestProvider&gt;
@@ -222,7 +223,7 @@ public class JLinkMojo
      *   .
      * &lt;/suggestProviders&gt;
      * </pre>
-     * 
+     *
      * The jlink command linke equivalent: <code>--suggest-providers [&lt;name&gt;,...]</code>
      */
     @Parameter
@@ -253,6 +254,7 @@ public class JLinkMojo
     @Parameter( defaultValue = "${project.build.finalName}", readonly = true )
     private String finalName;
 
+    @Override
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -282,6 +284,12 @@ public class JLinkMojo
         failIfParametersAreNotInTheirValidValueRanges();
 
         ifOutputDirectoryExistsDelteIt();
+
+        for ( Dependency c : getProject().getDependencies() )
+        {
+            System.out.println( c );
+            System.out.println( c.getType() );
+        }
 
         Collection<String> modulesToAdd = new ArrayList<>();
         if ( addModules != null )
@@ -333,7 +341,7 @@ public class JLinkMojo
 
     private List<File> getCompileClasspathElements( MavenProject project )
     {
-        List<File> list = new ArrayList<File>( project.getArtifacts().size() + 1 );
+        List<File> list = new ArrayList<>( project.getArtifacts().size() + 1 );
 
         for ( Artifact a : project.getArtifacts() )
         {
@@ -344,6 +352,38 @@ public class JLinkMojo
     }
 
     private Map<String, File> getModulePathElements()
+            throws MojoFailureException
+    {
+        getLog().info( "micbinz extension." );
+        Map<String, File> result = getModulePathElementsImpl();
+
+        for ( Dependency c : getProject().getDependencies() )
+        {
+            getLog().info( c.toString() );
+        }
+
+        for ( Artifact c : getProject().getArtifacts() )
+        {
+            String artifactId = c.getArtifactId();
+
+            if ( result.containsKey( artifactId ) )
+            {
+                continue;
+            }
+
+            File artifactFile = c.getFile();
+            if ( result.containsValue( artifactFile ) )
+            {
+                continue;
+            }
+
+            result.put( artifactId, artifactFile );
+        }
+
+        return result;
+    }
+
+    private Map<String, File> getModulePathElementsImpl()
         throws MojoFailureException
     {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
@@ -412,7 +452,7 @@ public class JLinkMojo
                 }
             }
 
-        }   
+        }
         catch ( IOException e )
         {
             getLog().error( e.getMessage() );
