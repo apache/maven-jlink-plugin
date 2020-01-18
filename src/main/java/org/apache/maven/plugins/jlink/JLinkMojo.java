@@ -236,6 +236,12 @@ public class JLinkMojo
     private boolean verbose;
 
     /**
+     * Copy locales (michab66).
+     */
+    @Parameter
+    private String includeLocales;
+    
+    /**
      * The JAR archiver needed for archiving the environments.
      */
     @Component( role = Archiver.class, hint = "zip" )
@@ -641,6 +647,11 @@ public class JLinkMojo
 
         if ( !modulesToAdd.isEmpty() )
         {
+            if ( hasLocalesToInclude() )
+            {
+                modulesToAdd.add( "jdk.localedata" );
+            }
+
             argsFile.println( "--add-modules" );
             // This must be name of the module and *NOT* the name of the
             // file! Can we somehow pre check this information to fail early?
@@ -665,6 +676,12 @@ public class JLinkMojo
         {
             argsFile.println( "--verbose" );
         }
+        
+        if ( hasLocalesToInclude() )
+        {
+            argsFile.printf( "--include-locales=%s\n", includeLocales );
+        }
+        
         argsFile.close();
 
         Commandline cmd = new Commandline();
@@ -681,5 +698,9 @@ public class JLinkMojo
     private boolean hasLimitModules()
     {
         return limitModules != null && !limitModules.isEmpty();
+    }
+    private boolean hasLocalesToInclude()
+    {
+        return includeLocales != null && !includeLocales.isEmpty();
     }
 }
