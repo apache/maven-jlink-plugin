@@ -314,7 +314,7 @@ public class JLinkMojo
 
         for ( Entry<String, File> item : getModulePathElements().entrySet() )
         {
-            if ( excludeModules.contains( item.getKey()  ) )
+            if ( excludeModules != null && excludeModules.contains( item.getKey()  ) )
             {
                 continue;
             }
