@@ -173,7 +173,7 @@ public class JLinkMojo
     private String endian;
 
     /**
-     * Include additional paths on the <code>--module-path</code> option. Project dedependencies and JDK modules are
+     * Include additional paths on the <code>--module-path</code> option. Project dependencies and JDK modules are
      * automatically added.
      */
     @Parameter
