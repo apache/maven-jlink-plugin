@@ -229,6 +229,27 @@ public class JLinkMojo
     private List<String> suggestProviders;
 
     /**
+     * Includes the list of locales where langtag is a BCP 47 language tag.
+     *
+     * <p>This option supports locale matching as defined in RFC 4647.
+     * Ensure that you add the module jdk.localedata when using this option.</p>
+     *
+     * <p>The command line equivalent is: <code>--include-locales=en,ja,*-IN</code>.</p>
+     *
+     * <pre>
+     * &lt;includeLocales&gt;
+     *   &lt;includeLocale&gt;en&lt;/includeLocale&gt;
+     *   &lt;includeLocale&gt;ja&lt;/includeLocale&gt;
+     *   &lt;includeLocale&gt;*-IN&lt;/includeLocale&gt;
+     *   .
+     *   .
+     * &lt;/includeLocales&gt;
+     * </pre>
+     */
+    @Parameter
+    private List<String> includeLocales;
+
+    /**
      * This will turn on verbose mode. The jlink command line equivalent is: <code>--verbose</code>
      */
     @Parameter( defaultValue = "false" )
@@ -608,6 +629,15 @@ public class JLinkMojo
             argsFile.append( '"' ).append( sb.replace( "\\", "\\\\" ) ).println( '"' );
         }
 
+        if ( hasIncludeLocales() )
+        {
+            argsFile.println( "--add-modules" );
+            argsFile.println( "jdk.localedata" );
+            argsFile.println( "--include-locales" );
+            String sb = getCommaSeparatedList( includeLocales );
+            argsFile.println( sb );
+        }
+
         if ( pluginModulePath != null )
         {
             argsFile.println( "--plugin-module-path" );
@@ -631,6 +661,11 @@ public class JLinkMojo
         cmd.createArg().setValue( '@' + file.getAbsolutePath() );
 
         return cmd;
+    }
+
+    private boolean hasIncludeLocales()
+    {
+        return includeLocales != null && !includeLocales.isEmpty();
     }
 
     private boolean hasSuggestProviders()
