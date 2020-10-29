@@ -65,8 +65,8 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.0</mavenVersion>
-    <maven.compiler.release>11</maven.compiler.release>
+    <mavenVersion>3.1.0</mavenVersion>
+    <maven.compiler.release>8</maven.compiler.release>
     <project.build.outputTimestamp>2020-04-07T21:04:00Z</project.build.outputTimestamp>
   </properties>
 
@@ -143,14 +143,14 @@
         </plugin>
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.0.0-M1</version>
+          <version>3.0.0-M3</version>
           <executions>
             <execution>
               <id>enforce-bytecode-version</id>
               <configuration>
                 <rules>
                   <enforceBytecodeVersion>
-                    <maxJdkVersion>1.7</maxJdkVersion>
+                    <maxJdkVersion>8</maxJdkVersion>
                     <excludes>
                       <exclude>org.ow2.asm:asm</exclude>
                     </excludes>
