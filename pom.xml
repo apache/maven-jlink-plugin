@@ -66,7 +66,8 @@
 
   <properties>
     <mavenVersion>3.1.0</mavenVersion>
-    <maven.compiler.release>8</maven.compiler.release>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
     <project.build.outputTimestamp>2020-04-07T21:04:00Z</project.build.outputTimestamp>
   </properties>
 
@@ -175,7 +176,7 @@
             <configuration>
               <rules>
                 <enforceBytecodeVersion>
-                  <maxJdkVersion>8</maxJdkVersion>
+                  <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
                   <excludes>
                     <exclude>org.ow2.asm:asm</exclude>
                   </excludes>
