@@ -67,6 +67,7 @@
   <properties>
     <mavenVersion>3.1.0</mavenVersion>
     <maven.compiler.release>8</maven.compiler.release>
+    <maven.compiler.target>8</maven.compiler.target> <!-- this property is needed by enforcer plugin configured in maven-parent -->
     <project.build.outputTimestamp>2020-04-07T21:04:00Z</project.build.outputTimestamp>
   </properties>
 
@@ -117,16 +118,38 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>2.19.0</version>
+      <version>3.5.13</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>2.9.1</version>
+      <version>3.16.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.7.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <pluginManagement>
@@ -146,7 +169,7 @@
           <version>3.0.0-M3</version>
           <executions>
             <execution>
-              <id>enforce-bytecode-version</id>
+              <id>enforce-bytecode-version</id> <!-- todo this configuration doesn't overwrite the execution defined in maven-parent -->
               <configuration>
                 <rules>
                   <enforceBytecodeVersion>
