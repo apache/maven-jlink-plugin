@@ -250,10 +250,8 @@
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <projectsDirectory>src/it/projects</projectsDirectory>
               <pomIncludes>
-                <pomInclude>**/pom.xml</pomInclude>
-                <!--
+                <pomInclude>*/pom.xml</pomInclude>
                 <pomInclude>cli-options/**/pom.xml</pomInclude>
-                -->
               </pomIncludes>
               <pomExcludes>
                 <!--
