@@ -39,6 +39,7 @@
   <modules>
     <module>api</module>
     <module>app</module>
+    <module>dist</module>
   </modules>
 
   <build>
