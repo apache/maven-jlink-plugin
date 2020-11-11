@@ -66,8 +66,8 @@
 
   <properties>
     <mavenVersion>3.1.0</mavenVersion>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.outputTimestamp>2020-11-11T21:56:48Z</project.build.outputTimestamp>
   </properties>
 
