@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,21 +17,7 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
-import java.util.jar.*
-import org.codehaus.plexus.util.*
+module com.reactor.project.dist {
+  requires com.reactor.project.app;
 
-File target = new File( basedir, "app/target" )
-assert target.isDirectory()
-
-File jarArtifact = new File( target, "maven-jlink-plugin-mjlink-9-app-96.0.jar" )
-assert jarArtifact.isFile()
-
-File distTarget = new File( basedir, "dist/target" )
-assert distTarget.isDirectory()
-
-File artifact = new File( distTarget, "maven-jlink-plugin-mjlink-9-dist-96.0.zip" )
-assert artifact.isFile()
-
-// optional: check if it contains a launcher script
+}

@@ -30,19 +30,31 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>maven-jlink-plugin-mjlink-9-app</artifactId>
-  <packaging>jar</packaging>
-  <name>mjlink-9-app</name>
+  <artifactId>maven-jlink-plugin-mjlink-9-dist</artifactId>
+  <packaging>jlink</packaging>
+  <name>mjlink-9-jlink</name>
   <url>https://maven.apache.org</url>
 
-  <description>mjlink-9-app</description>
+  <description>mjlink-9-jlink</description>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-jlink-plugin-mjlink-9-api</artifactId>
+      <artifactId>maven-jlink-plugin-mjlink-9-app</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jlink-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <launcher>reactorapp=com.reactor.project.app/com.reactor.project.app.App</launcher>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
