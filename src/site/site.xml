@@ -22,11 +22,6 @@
 <project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd"
 >
-  <custom>
-    <fluidoSkin>
-      <profile>pre-release</profile>
-    </fluidoSkin>
-  </custom>
   <body>
     <menu name="Overview">
       <item name="Introduction" href="index.html" />
