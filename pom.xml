@@ -111,7 +111,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -125,16 +125,6 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>3.16.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.vintage</groupId>
-      <artifactId>junit-vintage-engine</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -242,7 +232,7 @@
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <environmentVariables>
                 <!--
-                  ! Prevent reading the .mavenrc or maven_pre.bat on Windows 
+                  ! Prevent reading the .mavenrc or maven_pre.bat on Windows
                   ! in integration tests.
                 -->
                 <MAVEN_SKIP_RC>1</MAVEN_SKIP_RC>
