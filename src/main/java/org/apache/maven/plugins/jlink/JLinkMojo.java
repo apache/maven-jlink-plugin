@@ -99,6 +99,27 @@ public class JLinkMojo
     private String launcher;
 
     /**
+     * These JVM arguments will be appended to the {@code lib/modules} file.<br>
+     * <strong>This parameter requires at least JDK 14.<br></strong>
+     *
+     * <p>The command line equivalent is: {@code jlink --add-options="…"}.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>
+     *   &lt;addOptions&gt;
+     *     &lt;addOption&gt;-Xmx256m&lt;/addOption&gt;
+     *     &lt;addOption&gt;--enable-preview&lt;/addOption&gt;
+     *     &lt;addOption&gt;-Dvar=value&lt;/addOption&gt;
+     *   &lt;/addOptions&gt;
+     * </pre>
+     *
+     * <p>Above example will result in {@code jlink --add-options="-Xmx256m" --enable-preview -Dvar=value"}.</p>
+     */
+    @Parameter
+    private List<String> addOptions;
+
+    /**
      * Limit the universe of observable modules. The following gives an example of the configuration which can be used
      * in the <code>pom.xml</code> file.
      * 
@@ -594,6 +615,12 @@ public class JLinkMojo
         {
             jlinkArgs.add( "--launcher" );
             jlinkArgs.add( launcher );
+        }
+        if ( addOptions != null )
+        {
+            // needs JDK 14+
+            jlinkArgs.add( "--add-options" );
+            jlinkArgs.add( String.format( "\"%s\"%n", String.join( " ", addOptions ) ) );
         }
 
         if ( disablePlugin != null )
