@@ -43,6 +43,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
@@ -51,6 +52,9 @@ import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
 import org.codehaus.plexus.languages.java.jpms.LocationManager;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
+import org.codehaus.plexus.languages.java.version.JavaVersion;
+
+import static java.util.Collections.singletonMap;
 
 /**
  * The JLink goal is intended to create a Java Run Time Image file based on
@@ -97,6 +101,27 @@ public class JLinkMojo
      */
     @Parameter
     private String launcher;
+
+    /**
+     * These JVM arguments will be appended to the {@code lib/modules} file.<br>
+     * <strong>This parameter requires at least JDK 14.<br></strong>
+     *
+     * <p>The command line equivalent is: {@code jlink --add-options="…"}.</p>
+     *
+     * <p>Example:</p>
+     *
+     * <pre>
+     *   &lt;addOptions&gt;
+     *     &lt;addOption&gt;-Xmx256m&lt;/addOption&gt;
+     *     &lt;addOption&gt;--enable-preview&lt;/addOption&gt;
+     *     &lt;addOption&gt;-Dvar=value&lt;/addOption&gt;
+     *   &lt;/addOptions&gt;
+     * </pre>
+     *
+     * <p>Above example will result in {@code jlink --add-options="-Xmx256m" --enable-preview -Dvar=value"}.</p>
+     */
+    @Parameter
+    private List<String> addOptions;
 
     /**
      * Limit the universe of observable modules. The following gives an example of the configuration which can be used
@@ -519,6 +544,37 @@ public class JLinkMojo
             getLog().error( message );
             throw new MojoFailureException( message );
         }
+
+        if ( addOptions != null && !addOptions.isEmpty() )
+        {
+            requireJdk14();
+        }
+    }
+
+    private void requireJdk14() throws MojoFailureException
+    {
+        // needs JDK 14+
+        Optional<Toolchain> optToolchain = getToolchain();
+        String java14reqMsg = "parameter 'addOptions' needs at least a Java 14 runtime or a Java 14 toolchain.";
+
+        if ( optToolchain.isPresent() )
+        {
+            Toolchain toolchain = optToolchain.orElseThrow( NoSuchElementException::new );
+            if ( !( toolchain instanceof ToolchainPrivate ) )
+            {
+                getLog().warn( "Unable to check toolchain java version." );
+                return;
+            }
+            ToolchainPrivate toolchainPrivate = (ToolchainPrivate) toolchain;
+            if ( !toolchainPrivate.matchesRequirements( singletonMap( "jdk", "14" ) ) )
+            {
+                throw new MojoFailureException( java14reqMsg );
+            }
+        }
+        else if ( !JavaVersion.JAVA_VERSION.isAtLeast( "14" ) )
+        {
+            throw new MojoFailureException( java14reqMsg );
+        }
     }
 
     /**
@@ -594,6 +650,11 @@ public class JLinkMojo
         {
             jlinkArgs.add( "--launcher" );
             jlinkArgs.add( launcher );
+        }
+        if ( addOptions != null && !addOptions.isEmpty() )
+        {
+            jlinkArgs.add( "--add-options" );
+            jlinkArgs.add( String.format( "\"%s\"", String.join( " ", addOptions ) ) );
         }
 
         if ( disablePlugin != null )
