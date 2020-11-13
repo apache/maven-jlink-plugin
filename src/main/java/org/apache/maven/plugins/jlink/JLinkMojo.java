@@ -49,7 +49,6 @@ import org.codehaus.plexus.languages.java.jpms.LocationManager;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * The JLink goal is intended to create a Java Run Time Image file based on
@@ -64,8 +63,6 @@ import org.codehaus.plexus.util.cli.Commandline;
 public class JLinkMojo
     extends AbstractJLinkMojo
 {
-    private static final String JMODS = "jmods";
-
     @Component
     private LocationManager locationManager;
 
@@ -274,41 +271,20 @@ public class JLinkMojo
     @Parameter( defaultValue = "${project.build.finalName}", readonly = true )
     private String finalName;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException
     {
-
-        String jLinkExec = getExecutable();
-
-        getLog().info( "Toolchain in maven-jlink-plugin: jlink [ " + jLinkExec + " ]" );
-
-        // TODO: Find a more better and cleaner way?
-        File jLinkExecuteable = new File( jLinkExec );
-
-        // Really Hacky...do we have a better solution to find the jmods directory of the JDK?
-        File jLinkParent = jLinkExecuteable.getParentFile().getParentFile();
-        File jmodsFolder;
-        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
-        {
-            jmodsFolder = new File ( sourceJdkModules, JMODS );
-        }
-        else
-        {
-            jmodsFolder = new File( jLinkParent, JMODS );
-        }
-
-        getLog().debug( " Parent: " + jLinkParent.getAbsolutePath() );
-        getLog().debug( " jmodsFolder: " + jmodsFolder.getAbsolutePath() );
-
         failIfParametersAreNotInTheirValidValueRanges();
 
         ifOutputDirectoryExistsDelteIt();
 
+        JLinkExecutor jLinkExec = getExecutor();
         Collection<String> modulesToAdd = new ArrayList<>();
         if ( addModules != null )
         {
             modulesToAdd.addAll( addModules );
         }
+        jLinkExec.addAllModules( modulesToAdd );
 
         Collection<String> pathsOfModules = new ArrayList<>();
         if ( modulePaths != null )
@@ -326,27 +302,29 @@ public class JLinkMojo
         }
 
         // The jmods directory of the JDK
-        pathsOfModules.add( jmodsFolder.getAbsolutePath() );
+        jLinkExec.getJmodsFolder( this.sourceJdkModules ).ifPresent(
+                jmodsFolder -> pathsOfModules.add( jmodsFolder.getAbsolutePath() )
+        );
+        jLinkExec.addAllModulePaths( pathsOfModules );
 
-        Commandline cmd;
+        File argsFile;
         try
         {
-            cmd = createJLinkCommandLine( pathsOfModules, modulesToAdd );
+            argsFile = createJlinkArgsFile( pathsOfModules, modulesToAdd );
         }
         catch ( IOException e )
         {
             throw new MojoExecutionException( e.getMessage() );
         }
-        cmd.setExecutable( jLinkExec );
 
-        executeCommand( cmd, outputDirectoryImage );
+        jLinkExec.executeJlink( argsFile );
 
         File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
 
         if ( projectHasAlreadySetAnArtifact() )
         {
             throw new MojoExecutionException( "You have to use a classifier "
-                + "to attach supplemental artifacts to the project instead of replacing them." );
+                            + "to attach supplemental artifacts to the project instead of replacing them." );
         }
 
         getProject().getArtifact().setFile( createZipArchiveFromImage );
@@ -443,13 +421,12 @@ public class JLinkMojo
         return modulepathElements;
     }
 
-    private String getExecutable()
-        throws MojoFailureException
+    private JLinkExecutor getExecutor() throws MojoFailureException
     {
-        String jLinkExec;
+        JLinkExecutor jLinkExec;
         try
         {
-            jLinkExec = getJLinkExecutable();
+            jLinkExec = getJlinkExecutor();
         }
         catch ( IOException e )
         {
@@ -510,7 +487,7 @@ public class JLinkMojo
         if ( endian != null && ( !"big".equals( endian ) && !"little".equals( endian ) ) )
         {
             String message = "The given endian parameter " + endian
-                + " does not contain one of the following values: 'little' or 'big'.";
+                    + " does not contain one of the following values: 'little' or 'big'.";
             getLog().error( message );
             throw new MojoFailureException( message );
         }
@@ -537,10 +514,10 @@ public class JLinkMojo
         }
     }
 
-    private Commandline createJLinkCommandLine( Collection<String> pathsOfModules, Collection<String> modulesToAdd )
-        throws IOException
+    private File createJlinkArgsFile( Collection<String> pathsOfModules,
+                                      Collection<String> modulesToAdd ) throws IOException
     {
-        File file = new File( outputDirectoryImage.getParentFile(), "jlinkArgs" );
+        File file = new File( this.outputDirectoryImage.getParentFile(), "jlinkArgs" );
         if ( !getLog().isDebugEnabled() )
         {
             file.deleteOnExit();
@@ -656,11 +633,7 @@ public class JLinkMojo
             argsFile.println( "--verbose" );
         }
         argsFile.close();
-
-        Commandline cmd = new Commandline();
-        cmd.createArg().setValue( '@' + file.getAbsolutePath() );
-
-        return cmd;
+        return file;
     }
 
     private boolean hasIncludeLocales()
