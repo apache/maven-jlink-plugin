@@ -32,12 +32,17 @@ import java.nio.file.Files;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * JDK9+ executor for jlink.
+ *
+ * <p>This implementation uses the JDK9+ Toolprovider SPI to find and execute jlink.
+ * This way, no fork needs to be created.</p>
+ */
 class JLinkExecutor extends AbstractJLinkExecutor
 {
 
@@ -63,14 +68,9 @@ class JLinkExecutor extends AbstractJLinkExecutor
 
     protected final ToolProvider getJLinkExecutable()
     {
-        Optional<ToolProvider> jlink = ToolProvider.findFirst( "jlink" );
-
-        if ( !jlink.isPresent() )
-        {
-            throw new IllegalStateException( "No jlink tool found." );
-        }
-
-        return jlink.orElseThrow( NoSuchElementException::new );
+        return ToolProvider
+                .findFirst( "jlink" )
+                .orElseThrow( () -> new IllegalStateException( "No jlink tool found." ) );
     }
 
 

@@ -32,7 +32,7 @@ import java.util.Optional;
 /**
  * JDK 8-only Jlink executor.
  *
- * <p>As JDK8 does not ship jlink, either a toolchain or JAVA_HOME is required.</p>
+ * <p>As JDK8 does not ship jlink, a toolchain is required.</p>
  */
 class JLinkExecutor extends AbstractJLinkExecutor
 {
