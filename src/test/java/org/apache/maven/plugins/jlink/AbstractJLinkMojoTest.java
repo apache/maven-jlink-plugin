@@ -28,8 +28,9 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -39,7 +40,7 @@ public class AbstractJLinkMojoTest
 {
     private AbstractJLinkMojo mojoMock;
 
-    @Before
+    @BeforeEach
     public void before()
     {
         this.mojoMock = mock( AbstractJLinkMojo.class, Mockito.CALLS_REAL_METHODS );
@@ -47,6 +48,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "convert should return single characters" )
     public void convertShouldReturnSingleCharacter()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x" );
@@ -54,6 +56,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "convert should two characters separated by path separator" )
     public void convertShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x;a" );
@@ -61,6 +64,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "convert using differential delimiter should return two characters separated by path separator" )
     public void convertUsingDifferentDelimiterShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x:a" );
@@ -68,6 +72,8 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "convertSeparatedModulePathToPlatformSeparatedModulePath() "
+                          + "should return two characters separated by path separator" )
     public void convertUsingMultipleDelimitersShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x:a::" );
@@ -75,6 +81,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "getPlatformDependSeparateList() should return a single character" )
     public void getPlatformDependSeparateListShouldReturnASingleCharacter()
     {
         String result = mojoMock.getPlatformDependSeparateList( Collections.singletonList( "A" ) );
@@ -82,6 +89,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "getPlatformDependSeparateList() should return two characters separated" )
     public void getPlatformDependSeparateListShouldReturnTwoCharactersSeparated()
     {
         String result = mojoMock.getPlatformDependSeparateList( Arrays.asList( "A", "B" ) );
@@ -89,6 +97,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "getPlatformDependSeparateList() should return three characters separated" )
     public void getPlatformDependSeparateListShouldReturnThreeCharactersSeparated()
     {
         String result = mojoMock.getPlatformDependSeparateList( Arrays.asList( "A", "B", "C" ) );
@@ -96,6 +105,7 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "getCommaSeparatedList() should return a single character" )
     public void getCommaSeparatedListShouldReturnASingleCharacter()
     {
         String result = mojoMock.getCommaSeparatedList( Arrays.asList( "A" ) );
@@ -103,31 +113,11 @@ public class AbstractJLinkMojoTest
     }
 
     @Test
+    @DisplayName( "getCommaSeparatedList() should return two characters separated by comma" )
     public void getCommaSeparatedListShouldReturnTwoCharactersSeparatedByComma()
     {
         String result = mojoMock.getCommaSeparatedList( Arrays.asList( "A", "B" ) );
         assertThat( result ).isEqualTo( "A,B" );
     }
 
-//    @Test
-//    public void xxx()
-//        throws MojoExecutionException, IOException, CommandLineException
-//    {
-//        Process p = mock( Process.class );
-//
-//        String b = "Error occured";
-//        byte[] bytes = b.getBytes();
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        baos.write( bytes );
-//        
-//        when (p.getOutputStream()).thenReturn( baos );
-//        
-//        Commandline cmd = mock( Commandline.class );
-//        when (cmd.execute()).thenReturn( p );
-//        
-//        File outputDirectory = mock( File.class );
-//
-//        mojoMock.executeCommand( cmd, outputDirectory );
-//
-//    }
 }
