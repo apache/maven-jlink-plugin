@@ -26,21 +26,15 @@ boolean result = false;
 
 try
 {
-    File target = new File( basedir, "target" );
-    if ( !target.exists() || !target.isDirectory() )
+    File buildLog = new File( basedir, "build.log" );
+    if ( !buildLog.exists() || buildLog.isDirectory() )
     {
-        System.err.println( "target file is missing or not a directory." );
-        return false;
-    }
-    File jlinkArgs = new File( target, "jlinkArgs" );
-    if ( !jlinkArgs.exists() || jlinkArgs.isDirectory() )
-    {
-        System.err.println( "jlinkArgs file is missing or is a directory." );
+        System.err.println( "build.log file is missing or is a directory." );
         return false;
     }
 
-    def line = jlinkArgs.eachLine { line ->
-        if (line.equals('en,ja,de,*-IN'))
+    def line = buildLog.eachLine { line ->
+        if (line.contains('--include-locales, en,ja,de,*-IN'))
         {
             result = true;
         }

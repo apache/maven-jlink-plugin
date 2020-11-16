@@ -58,7 +58,7 @@ abstract class AbstractJLinkExecutor
 
     public abstract Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules );
 
-    public abstract int executeJlink( File argsFile ) throws MojoExecutionException;
+    public abstract int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException;
 
     public void addAllModules( Collection<String> modulesToAdd )
     {

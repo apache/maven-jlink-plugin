@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -76,20 +77,20 @@ class JLinkExecutor extends AbstractJLinkExecutor
      * @return the exit code ({@code 0} on success).
      */
     @Override
-    public int executeJlink( File argsFile )
+    public int executeJlink( List<String> jlinkArgs )
     {
         getLog().info( "Toolchain in maven-jlink-plugin: jlink [ " + this.jLinkExec + " ]" );
 
-        Commandline cmd = createJLinkCommandLine( argsFile );
+        Commandline cmd = createJLinkCommandLine( jlinkArgs );
         cmd.setExecutable( this.jLinkExec );
 
         throw new UnsupportedOperationException( "not implemented" );
     }
 
-    private Commandline createJLinkCommandLine( File argsFile )
+    private Commandline createJLinkCommandLine( List<String> jlinkArgs )
     {
         Commandline cmd = new Commandline();
-        cmd.createArg().setValue( '@' + argsFile.getAbsolutePath() );
+        jlinkArgs.forEach( arg -> cmd.createArg().setValue( arg ) );
 
         return cmd;
     }

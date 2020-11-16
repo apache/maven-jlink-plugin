@@ -28,14 +28,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * JDK9+ executor for jlink.
@@ -73,49 +68,13 @@ class JLinkExecutor extends AbstractJLinkExecutor
                 .orElseThrow( () -> new IllegalStateException( "No jlink tool found." ) );
     }
 
-
-    protected Stream<String> argsfileToArgs( File argsFile )
-    {
-        try
-        {
-            List<String> strings = Files.readAllLines( argsFile.toPath() );
-            Deque<String> out = new ArrayDeque<>();
-
-            for ( String line : strings )
-            {
-                if ( line.startsWith( "-" ) )
-                {
-                    out.add( line );
-                    continue;
-                }
-
-                if ( line.startsWith( "\"" ) && line.endsWith( "\"" ) )
-                {
-                    out.add( line.substring( 1, line.lastIndexOf( "\"" ) ) );
-                    continue;
-                }
-
-                out.add( line );
-            }
-
-            return out.stream();
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Unable to read jlinkArgs file: " + argsFile.getAbsolutePath() );
-        }
-
-    }
-
     @Override
-    public int executeJlink( File argsFile ) throws MojoExecutionException
+    public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
     {
-        List<String> actualArgs = this.argsfileToArgs( argsFile ).collect( Collectors.toList() );
-
         if ( getLog().isDebugEnabled() )
         {
             // no quoted arguments ???
-            getLog().debug( this.toolProvider.name() + " " + actualArgs );
+            getLog().debug( this.toolProvider.name() + " " + jlinkArgs );
         }
 
         try ( ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
@@ -123,7 +82,7 @@ class JLinkExecutor extends AbstractJLinkExecutor
               ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
               PrintWriter out = new PrintWriter( baosOut ) )
         {
-            int exitCode = this.toolProvider.run( out, err, actualArgs.toArray( new String[0] ) );
+            int exitCode = this.toolProvider.run( out, err, jlinkArgs.toArray( new String[0] ) );
             out.flush();
             err.flush();
 
@@ -151,7 +110,7 @@ class JLinkExecutor extends AbstractJLinkExecutor
                 }
                 msg.append( '\n' );
                 msg.append( "Command line was: " ).append( this.toolProvider.name() ).append( ' ' ).append(
-                        actualArgs ).append( '\n' ).append( '\n' );
+                        jlinkArgs ).append( '\n' ).append( '\n' );
 
                 throw new MojoExecutionException( msg.toString() );
             }
