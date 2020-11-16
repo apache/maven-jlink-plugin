@@ -23,13 +23,11 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.Properties;
 
 /**
  * JDK 8-only Jlink executor.
@@ -99,73 +97,41 @@ class JLinkExecutor extends AbstractJLinkExecutor
 
     protected final String getJLinkExecutable() throws IOException
     {
-        String jLinkExecutable = null;
-        if ( getToolchain() != null )
+        if ( getToolchain() == null )
         {
-            jLinkExecutable = getToolchain().findTool( "jlink" );
+            getLog().error( "Either JDK9+ or a toolchain "
+                    + "pointing to a JDK9+ containing a jlink binary is required." );
+            getLog().info( "See https://maven.apache.org/guides/mini/guide-using-toolchains.html "
+                    + "for mor information." );
+            throw new IllegalStateException( "Running on JDK8 and no toolchain found." );
+        }
+
+        String jLinkExecutable = getToolchain().findTool( "jlink" );
+
+        if ( StringUtils.isEmpty( jLinkExecutable ) )
+        {
+            throw new IOException( "The jlink executable '" + jLinkExecutable + "' doesn't exist or is not a file." );
         }
 
         // TODO: Check if there exist a more elegant way?
         String jLinkCommand = "jlink" + ( SystemUtils.IS_OS_WINDOWS ? ".exe" : "" );
 
-        File jLinkExe;
+        File jLinkExe = new File( jLinkExecutable );
 
-        if ( StringUtils.isNotEmpty( jLinkExecutable ) )
+        if ( jLinkExe.isDirectory() )
         {
-            jLinkExe = new File( jLinkExecutable );
-
-            if ( jLinkExe.isDirectory() )
-            {
-                jLinkExe = new File( jLinkExe, jLinkCommand );
-            }
-
-            if ( SystemUtils.IS_OS_WINDOWS && jLinkExe.getName().indexOf( '.' ) < 0 )
-            {
-                jLinkExe = new File( jLinkExe.getPath() + ".exe" );
-            }
-
-            if ( !jLinkExe.isFile() )
-            {
-                throw new IOException( "The jlink executable '" + jLinkExe + "' doesn't exist or is not a file." );
-            }
-            return jLinkExe.getAbsolutePath();
+            jLinkExe = new File( jLinkExe, jLinkCommand );
         }
 
-        // ----------------------------------------------------------------------
-        // Try to find jlink from System.getProperty( "java.home" )
-        // By default, System.getProperty( "java.home" ) = JRE_HOME and JRE_HOME
-        // should be in the JDK_HOME
-        // ----------------------------------------------------------------------
-        jLinkExe = new File( SystemUtils.getJavaHome() + File.separator + ".." + File.separator + "bin", jLinkCommand );
-
-        // ----------------------------------------------------------------------
-        // Try to find javadocExe from JAVA_HOME environment variable
-        // ----------------------------------------------------------------------
-        if ( !jLinkExe.exists() || !jLinkExe.isFile() )
+        if ( SystemUtils.IS_OS_WINDOWS && jLinkExe.getName().indexOf( '.' ) < 0 )
         {
-            Properties env = CommandLineUtils.getSystemEnvVars();
-            String javaHome = env.getProperty( "JAVA_HOME" );
-            if ( StringUtils.isEmpty( javaHome ) )
-            {
-                throw new IOException( "The environment variable JAVA_HOME is not correctly set." );
-            }
-            if ( !new File( javaHome ).getCanonicalFile().exists() || new File( javaHome ).getCanonicalFile().isFile() )
-            {
-                throw new IOException(
-                        "The environment variable JAVA_HOME=" + javaHome
-                                + " doesn't exist or is not a valid directory." );
-            }
-
-            jLinkExe = new File( javaHome + File.separator + "bin", jLinkCommand );
+            jLinkExe = new File( jLinkExe.getPath() + ".exe" );
         }
 
-        if ( !jLinkExe.getCanonicalFile().exists() || !jLinkExe.getCanonicalFile().isFile() )
+        if ( !jLinkExe.isFile() )
         {
-            throw new IOException(
-                    "The jlink executable '" + jLinkExe
-                            + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );
+            throw new IOException( "The jlink executable '" + jLinkExe + "' doesn't exist or is not a file." );
         }
-
         return jLinkExe.getAbsolutePath();
     }
 }
