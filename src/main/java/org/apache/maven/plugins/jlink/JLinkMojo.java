@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -308,7 +310,14 @@ public class JLinkMojo
 
         List<String> jlinkArgs = createJlinkArgs( pathsOfModules, modulesToAdd );
 
-        jLinkExec.executeJlink( jlinkArgs );
+        try
+        {
+            jLinkExec.executeJlink( jlinkArgs );
+        }
+        catch ( IllegalStateException e )
+        {
+            throw new MojoFailureException( "Unable to find jlink command: " + e.getMessage(), e );
+        }
 
         File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
 
@@ -348,10 +357,12 @@ public class JLinkMojo
 
             ResolvePathsRequest<File> request = ResolvePathsRequest.ofFiles( dependencyArtifacts );
 
-            Toolchain toolchain = getToolchain();
-            if ( toolchain != null && toolchain instanceof DefaultJavaToolChain )
+            Optional<Toolchain> toolchain = getToolchain();
+            if ( toolchain.isPresent()
+                    && toolchain.orElseThrow( NoSuchElementException::new ) instanceof DefaultJavaToolChain )
             {
-                request.setJdkHome( new File( ( (DefaultJavaToolChain) toolchain ).getJavaHome() ) );
+                Toolchain toolcahin1 = toolchain.orElseThrow( NoSuchElementException::new );
+                request.setJdkHome( new File( ( (DefaultJavaToolChain) toolcahin1 ).getJavaHome() ) );
             }
 
             ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths( request );
@@ -412,18 +423,9 @@ public class JLinkMojo
         return modulepathElements;
     }
 
-    private JLinkExecutor getExecutor() throws MojoFailureException
+    private JLinkExecutor getExecutor()
     {
-        JLinkExecutor jLinkExec;
-        try
-        {
-            jLinkExec = getJlinkExecutor();
-        }
-        catch ( IOException e )
-        {
-            throw new MojoFailureException( "Unable to find jlink command: " + e.getMessage(), e );
-        }
-        return jLinkExec;
+        return getJlinkExecutor();
     }
 
     private boolean projectHasAlreadySetAnArtifact()

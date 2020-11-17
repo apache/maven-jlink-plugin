@@ -38,27 +38,14 @@ import java.util.spi.ToolProvider;
  * <p>This implementation uses the JDK9+ Toolprovider SPI to find and execute jlink.
  * This way, no fork needs to be created.</p>
  */
-class JLinkExecutor extends AbstractJLinkExecutor
+class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
-
     private final ToolProvider toolProvider;
 
     JLinkExecutor( Toolchain toolchain, Log log ) throws IOException
     {
         super( toolchain, log );
         this.toolProvider = getJLinkExecutable();
-    }
-
-    @Override
-    public Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules )
-    {
-        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
-        {
-            return Optional.of( new File( sourceJdkModules, JMODS ) );
-        }
-
-        // ToolProvider does not need jmods folder to be set.
-        return Optional.empty();
     }
 
     protected final ToolProvider getJLinkExecutable()
@@ -71,6 +58,11 @@ class JLinkExecutor extends AbstractJLinkExecutor
     @Override
     public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
     {
+        if (getToolchain().isPresent())
+        {
+            return super.executeJlink( jlinkArgs );
+        }
+
         if ( getLog().isDebugEnabled() )
         {
             // no quoted arguments ???
@@ -130,5 +122,22 @@ class JLinkExecutor extends AbstractJLinkExecutor
         {
             throw new MojoExecutionException( "Unable to execute jlink command: " + e.getMessage(), e );
         }
+    }
+
+    @Override
+    public Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules )
+    {
+        if ( getToolchain().isPresent())
+        {
+            return super.getJmodsFolder( sourceJdkModules );
+        }
+
+        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
+        {
+            return Optional.of( new File( sourceJdkModules, JMODS ) );
+        }
+
+        // ToolProvider does not need jmods folder to be set.
+        return Optional.empty();
     }
 }

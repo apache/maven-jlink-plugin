@@ -21,10 +21,8 @@ package org.apache.maven.plugins.jlink;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.toolchain.Toolchain;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -34,21 +32,14 @@ abstract class AbstractJLinkExecutor
 {
     protected static final String JMODS = "jmods";
 
-    private final Toolchain toolchain;
     private final Log log;
 
     private final List<String> modulesToAdd = new ArrayList<>();
     private final List<String> modulePaths = new ArrayList<>();
 
-    AbstractJLinkExecutor( Toolchain toolchain, Log log ) throws IOException
+    AbstractJLinkExecutor( Log log )
     {
-        this.toolchain = toolchain;
         this.log = log;
-    }
-
-    protected Toolchain getToolchain()
-    {
-        return this.toolchain;
     }
 
     protected Log getLog()

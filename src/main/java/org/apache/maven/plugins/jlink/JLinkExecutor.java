@@ -19,120 +19,19 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * JDK 8-only Jlink executor.
  *
  * <p>As JDK8 does not ship jlink, a toolchain is required.</p>
  */
-class JLinkExecutor extends AbstractJLinkExecutor
+class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
-    private final String jLinkExec;
-
-    JLinkExecutor( Toolchain toolchain, Log log ) throws IOException
+    JLinkExecutor( Toolchain toolchain, Log log )
     {
         super( toolchain, log );
-        this.jLinkExec = getJLinkExecutable();
     }
 
-    public File getJlinkExecutable()
-    {
-        return new File( this.jLinkExec );
-    }
-
-    @Override
-    public Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules )
-    {
-        // Really Hacky...do we have a better solution to find the jmods directory of the JDK?
-        File jLinkParent = getJlinkExecutable().getParentFile().getParentFile();
-        File jmodsFolder;
-        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
-        {
-            jmodsFolder = new File( sourceJdkModules, JMODS );
-        }
-        else
-        {
-            jmodsFolder = new File( jLinkParent, JMODS );
-        }
-
-        getLog().debug( " Parent: " + jLinkParent.getAbsolutePath() );
-        getLog().debug( " jmodsFolder: " + jmodsFolder.getAbsolutePath() );
-
-        return Optional.of( jmodsFolder );
-    }
-
-    /**
-     * Execute JLink via any means.
-     *
-     * @return the exit code ({@code 0} on success).
-     */
-    @Override
-    public int executeJlink( List<String> jlinkArgs )
-    {
-        getLog().info( "Toolchain in maven-jlink-plugin: jlink [ " + this.jLinkExec + " ]" );
-
-        Commandline cmd = createJLinkCommandLine( jlinkArgs );
-        cmd.setExecutable( this.jLinkExec );
-
-        throw new UnsupportedOperationException( "not implemented" );
-    }
-
-    private Commandline createJLinkCommandLine( List<String> jlinkArgs )
-    {
-        Commandline cmd = new Commandline();
-        jlinkArgs.forEach( arg -> cmd.createArg().setValue( arg ) );
-
-        return cmd;
-    }
-
-
-    protected final String getJLinkExecutable() throws IOException
-    {
-        if ( getToolchain() == null )
-        {
-            getLog().error( "Either JDK9+ or a toolchain "
-                    + "pointing to a JDK9+ containing a jlink binary is required." );
-            getLog().info( "See https://maven.apache.org/guides/mini/guide-using-toolchains.html "
-                    + "for mor information." );
-            throw new IllegalStateException( "Running on JDK8 and no toolchain found." );
-        }
-
-        String jLinkExecutable = getToolchain().findTool( "jlink" );
-
-        if ( StringUtils.isEmpty( jLinkExecutable ) )
-        {
-            throw new IOException( "The jlink executable '" + jLinkExecutable + "' doesn't exist or is not a file." );
-        }
-
-        // TODO: Check if there exist a more elegant way?
-        String jLinkCommand = "jlink" + ( SystemUtils.IS_OS_WINDOWS ? ".exe" : "" );
-
-        File jLinkExe = new File( jLinkExecutable );
-
-        if ( jLinkExe.isDirectory() )
-        {
-            jLinkExe = new File( jLinkExe, jLinkCommand );
-        }
-
-        if ( SystemUtils.IS_OS_WINDOWS && jLinkExe.getName().indexOf( '.' ) < 0 )
-        {
-            jLinkExe = new File( jLinkExe.getPath() + ".exe" );
-        }
-
-        if ( !jLinkExe.isFile() )
-        {
-            throw new IOException( "The jlink executable '" + jLinkExe + "' doesn't exist or is not a file." );
-        }
-        return jLinkExe.getAbsolutePath();
-    }
 }

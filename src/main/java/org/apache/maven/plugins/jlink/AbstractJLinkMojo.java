@@ -20,11 +20,11 @@ package org.apache.maven.plugins.jlink;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -60,12 +60,11 @@ public abstract class AbstractJLinkMojo
     private ToolchainManager toolchainManager;
 
     protected JLinkExecutor getJlinkExecutor()
-            throws IOException
     {
-        return new JLinkExecutor( getToolchain(), getLog() );
+        return new JLinkExecutor( getToolchain().orElse( null ), getLog() );
     }
 
-    protected Toolchain getToolchain()
+    protected Optional<Toolchain> getToolchain()
     {
         Toolchain tc = null;
 
@@ -106,7 +105,7 @@ public abstract class AbstractJLinkMojo
             tc = toolchainManager.getToolchainFromBuildContext( "jdk", getSession() );
         }
 
-        return tc;
+        return Optional.ofNullable( tc );
     }
 
     protected MavenProject getProject()
