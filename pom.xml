@@ -65,7 +65,8 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.1.0</mavenVersion>
+    <!-- required due to conflict with asm:asm:3.3.1 in Maven 3.1.0, see MNG-5499. -->
+    <mavenVersion>3.1.1</mavenVersion>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.outputTimestamp>2020-11-11T21:56:48Z</project.build.outputTimestamp>
