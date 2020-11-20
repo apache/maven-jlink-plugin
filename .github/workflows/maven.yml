@@ -42,43 +42,10 @@ jobs:
           restore-keys: |
             maven-${{ matrix.os }}-java${{ matrix.java }}-
             maven-${{ matrix.os }}-
-      - name: Set up Toolchain
-        if: ${{ matrix.java == '8' && matrix.os == 'ubuntu-latest' }}
-        uses: DamianReeves/write-file-action@v1.0
-        with:
-          path: it-toolchains.xml
-          contents: |
-            <?xml version="1.0" encoding="UTF8"?>
-            <toolchains>
-              <toolchain>
-                <type>jdk</type>
-                  <provides>
-                    <version>11</version>
-                    <vendor>adopt</vendor>
-                  </provides>
-                  <configuration>
-                    <jdkHome>$HOME/.jabba/jdk/adopt-openj9@1.11.0-7</jdkHome>
-                  </configuration>
-              </toolchain>
-            </toolchains>
-          write-mode: overwrite
-      - name: Install Toolchain JDK
-        if: ${{ matrix.java == '8' && matrix.os == 'ubuntu-latest' }}
-        uses: battila7/jdk-via-jabba@v1
-        with:
-          jdk: adopt-openj9@1.11.0-7
-      - name: delete jdk-via-jabba tmp dir
-        if: ${{ matrix.java == '8' && matrix.os == 'ubuntu-latest' }}
-        run: rm -rvf _temp/
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
 
       - name: Build with Maven
-        if: ${{ matrix.java != '8' || matrix.os != 'ubuntu-latest' }}
         run: mvn verify -e -B -V -Prun-its
-      - name: Build with Maven and Toolchain
-        if: ${{ matrix.java == '8' && matrix.os == 'ubuntu-latest' }}
-        run: mvn verify -e -B -V -Prun-its --global-toolchains it-toolchains.xml
-
