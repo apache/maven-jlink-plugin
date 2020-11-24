@@ -20,26 +20,19 @@ package org.apache.maven.plugins.jlink;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Optional;
 
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
-import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineException;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
 
 /**
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
@@ -66,139 +59,12 @@ public abstract class AbstractJLinkMojo
     @Component
     private ToolchainManager toolchainManager;
 
-    protected String getJLinkExecutable()
-        throws IOException
+    protected JLinkExecutor getJlinkExecutor()
     {
-        Toolchain tc = getToolchain();
-
-        String jLinkExecutable = null;
-        if ( tc != null )
-        {
-            jLinkExecutable = tc.findTool( "jlink" );
-        }
-
-        // TODO: Check if there exist a more elegant way?
-        String jLinkCommand = "jlink" + ( SystemUtils.IS_OS_WINDOWS ? ".exe" : "" );
-
-        File jLinkExe;
-
-        if ( StringUtils.isNotEmpty( jLinkExecutable ) )
-        {
-            jLinkExe = new File( jLinkExecutable );
-
-            if ( jLinkExe.isDirectory() )
-            {
-                jLinkExe = new File( jLinkExe, jLinkCommand );
-            }
-
-            if ( SystemUtils.IS_OS_WINDOWS && jLinkExe.getName().indexOf( '.' ) < 0 )
-            {
-                jLinkExe = new File( jLinkExe.getPath() + ".exe" );
-            }
-
-            if ( !jLinkExe.isFile() )
-            {
-                throw new IOException( "The jlink executable '" + jLinkExe + "' doesn't exist or is not a file." );
-            }
-            return jLinkExe.getAbsolutePath();
-        }
-
-        // ----------------------------------------------------------------------
-        // Try to find jlink from System.getProperty( "java.home" )
-        // By default, System.getProperty( "java.home" ) = JRE_HOME and JRE_HOME
-        // should be in the JDK_HOME
-        // ----------------------------------------------------------------------
-        jLinkExe = new File( SystemUtils.getJavaHome() + File.separator + ".." + File.separator + "bin", jLinkCommand );
-
-        // ----------------------------------------------------------------------
-        // Try to find javadocExe from JAVA_HOME environment variable
-        // ----------------------------------------------------------------------
-        if ( !jLinkExe.exists() || !jLinkExe.isFile() )
-        {
-            Properties env = CommandLineUtils.getSystemEnvVars();
-            String javaHome = env.getProperty( "JAVA_HOME" );
-            if ( StringUtils.isEmpty( javaHome ) )
-            {
-                throw new IOException( "The environment variable JAVA_HOME is not correctly set." );
-            }
-            if ( !new File( javaHome ).getCanonicalFile().exists()
-                || new File( javaHome ).getCanonicalFile().isFile() )
-            {
-                throw new IOException( "The environment variable JAVA_HOME=" + javaHome
-                    + " doesn't exist or is not a valid directory." );
-            }
-
-            jLinkExe = new File( javaHome + File.separator + "bin", jLinkCommand );
-        }
-
-        if ( !jLinkExe.getCanonicalFile().exists() || !jLinkExe.getCanonicalFile().isFile() )
-        {
-            throw new IOException( "The jlink executable '" + jLinkExe
-                + "' doesn't exist or is not a file. Verify the JAVA_HOME environment variable." );
-        }
-
-        return jLinkExe.getAbsolutePath();
+        return new JLinkExecutor( getToolchain().orElse( null ), getLog() );
     }
 
-    protected void executeCommand( Commandline cmd, File outputDirectory )
-        throws MojoExecutionException
-    {
-        if ( getLog().isDebugEnabled() )
-        {
-            // no quoted arguments ???
-            getLog().debug( CommandLineUtils.toString( cmd.getCommandline() ).replaceAll( "'", "" ) );
-        }
-
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-        try
-        {
-            int exitCode = CommandLineUtils.executeCommandLine( cmd, out, err );
-
-            String output = ( StringUtils.isEmpty( out.getOutput() ) ? null : '\n' + out.getOutput().trim() );
-
-            if ( exitCode != 0 )
-            {
-
-                if ( StringUtils.isNotEmpty( output ) )
-                {
-                    // Reconsider to use WARN / ERROR ?
-                   //  getLog().error( output );
-                    for ( String outputLine : output.split( "\n" ) )
-                    {
-                        getLog().error( outputLine );
-                    }
-                }
-
-                StringBuilder msg = new StringBuilder( "\nExit code: " );
-                msg.append( exitCode );
-                if ( StringUtils.isNotEmpty( err.getOutput() ) )
-                {
-                    msg.append( " - " ).append( err.getOutput() );
-                }
-                msg.append( '\n' );
-                msg.append( "Command line was: " ).append( cmd ).append( '\n' ).append( '\n' );
-
-                throw new MojoExecutionException( msg.toString() );
-            }
-
-            if ( StringUtils.isNotEmpty( output ) )
-            {
-                //getLog().info( output );
-                for ( String outputLine : output.split( "\n" ) )
-                {
-                    getLog().info( outputLine );
-                }
-            }
-        }
-        catch ( CommandLineException e )
-        {
-            throw new MojoExecutionException( "Unable to execute jlink command: " + e.getMessage(), e );
-        }
-
-    }
-
-    protected Toolchain getToolchain()
+    protected Optional<Toolchain> getToolchain()
     {
         Toolchain tc = null;
 
@@ -207,12 +73,12 @@ public abstract class AbstractJLinkMojo
             // Maven 3.3.1 has plugin execution scoped Toolchain Support
             try
             {
-                Method getToolchainsMethod = toolchainManager.getClass().getMethod( "getToolchains", MavenSession.class,
-                                                                                    String.class, Map.class );
+                Method getToolchainsMethod = toolchainManager.getClass().getMethod( "getToolchains",
+                        MavenSession.class, String.class, Map.class );
 
                 @SuppressWarnings( "unchecked" )
-                List<Toolchain> tcs =
-                    (List<Toolchain>) getToolchainsMethod.invoke( toolchainManager, session, "jdk", jdkToolchain );
+                List<Toolchain> tcs = (List<Toolchain>) getToolchainsMethod.invoke( toolchainManager, getSession(),
+                        "jdk", jdkToolchain );
 
                 if ( tcs != null && tcs.size() > 0 )
                 {
@@ -236,10 +102,10 @@ public abstract class AbstractJLinkMojo
         if ( tc == null )
         {
             // TODO: Check if we should make the type configurable?
-            tc = toolchainManager.getToolchainFromBuildContext( "jdk", session );
+            tc = toolchainManager.getToolchainFromBuildContext( "jdk", getSession() );
         }
 
-        return tc;
+        return Optional.ofNullable( tc );
     }
 
     protected MavenProject getProject()

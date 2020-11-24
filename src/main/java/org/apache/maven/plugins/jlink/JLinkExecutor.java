@@ -1,3 +1,5 @@
+package org.apache.maven.plugins.jlink;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,32 +19,19 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
-import java.util.jar.*;
-import org.codehaus.plexus.util.*;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.toolchain.Toolchain;
 
-boolean result = false;
-
-try
+/**
+ * JDK 8-only Jlink executor.
+ *
+ * <p>As JDK8 does not ship jlink, a toolchain is required.</p>
+ */
+class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
-    File buildLog = new File( basedir, "build.log" );
-    if ( !buildLog.exists() || buildLog.isDirectory() )
+    JLinkExecutor( Toolchain toolchain, Log log )
     {
-        System.err.println( "build.log file is missing or is a directory." );
-        return false;
+        super( toolchain, log );
     }
 
-    def line = buildLog.eachLine { line ->
-        if (line.contains('--include-locales, en,ja,de,*-IN'))
-        {
-            result = true;
-        }
-    }
 }
-catch( Throwable e )
-{
-    e.printStackTrace();
-}
-
-return result;
