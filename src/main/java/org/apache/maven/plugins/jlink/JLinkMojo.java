@@ -41,6 +41,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.codehaus.plexus.archiver.Archiver;
@@ -151,8 +152,11 @@ public class JLinkMojo
     /**
      * The output directory for the resulting Run Time Image. The created Run Time Image is stored in non compressed
      * form. This will later being packaged into a <code>zip</code> file. <code>--output &lt;path&gt;</code>
+     *
+     * <p>The {@link #classifier} is appended as a subdirecty if it exists,
+     * otherwise {@code default} will be used as subdirectory.
+     * This ensures that multiple executions using classifiers will not overwrite the previous run’s image.</p>
      */
-    // TODO: is this a good final location?
     @Parameter( defaultValue = "${project.build.directory}/maven-jlink", required = true, readonly = true )
     private File outputDirectoryImage;
 
@@ -266,16 +270,33 @@ public class JLinkMojo
     private File sourceJdkModules;
 
     /**
+     * Classifier to add to the artifact generated. If given, the artifact will be attached
+     * as a supplemental artifact.
+     * If not given this will create the main artifact which is the default behavior.
+     * If you try to do that a second time without using a classifier the build will fail.
+     */
+    @Parameter
+    private String classifier;
+
+    /**
      * Name of the generated ZIP file in the <code>target</code> directory. This will not change the name of the
      * installed/deployed file.
      */
     @Parameter( defaultValue = "${project.build.finalName}", readonly = true )
     private String finalName;
 
+    /**
+     * Convenience interface for plugins to add or replace artifacts and resources on projects.
+     */
+    @Component
+    private MavenProjectHelper projectHelper;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException
     {
         failIfParametersAreNotInTheirValidValueRanges();
+
+        setOutputDirectoryImage();
 
         ifOutputDirectoryExistsDelteIt();
 
@@ -321,13 +342,19 @@ public class JLinkMojo
 
         File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
 
-        if ( projectHasAlreadySetAnArtifact() )
+        if ( hasClassifier() )
         {
-            throw new MojoExecutionException( "You have to use a classifier "
-                            + "to attach supplemental artifacts to the project instead of replacing them." );
+            projectHelper.attachArtifact( getProject(), "jlink", getClassifier(), createZipArchiveFromImage );
         }
-
-        getProject().getArtifact().setFile( createZipArchiveFromImage );
+        else
+        {
+            if ( projectHasAlreadySetAnArtifact() )
+            {
+                throw new MojoExecutionException( "You have to use a classifier "
+                        + "to attach supplemental artifacts to the project instead of replacing them." );
+            }
+            getProject().getArtifact().setFile( createZipArchiveFromImage );
+        }
     }
 
     private List<File> getCompileClasspathElements( MavenProject project )
@@ -428,7 +455,7 @@ public class JLinkMojo
         return getJlinkExecutor();
     }
 
-    private boolean projectHasAlreadySetAnArtifact()
+    private boolean projectHasAlreadySetAnArtifact( )
     {
         if ( getProject().getArtifact().getFile() != null )
         {
@@ -440,12 +467,26 @@ public class JLinkMojo
         }
     }
 
+    /**
+     * @return true in case where the classifier is not {@code null} and contains something else than white spaces.
+     */
+    protected boolean hasClassifier()
+    {
+        boolean result = false;
+        if ( getClassifier() != null && !getClassifier().isEmpty() )
+        {
+            result = true;
+        }
+
+        return result;
+    }
+
     private File createZipArchiveFromImage( File outputDirectory, File outputDirectoryImage )
         throws MojoExecutionException
     {
         zipArchiver.addDirectory( outputDirectoryImage );
 
-        File resultArchive = getArchiveFile( outputDirectory, finalName, null, "zip" );
+        File resultArchive = getArchiveFile( outputDirectory, finalName, getClassifier(), "zip" );
 
         zipArchiver.setDestFile( resultArchive );
         try
@@ -483,6 +524,25 @@ public class JLinkMojo
                     + " does not contain one of the following values: 'little' or 'big'.";
             getLog().error( message );
             throw new MojoFailureException( message );
+        }
+    }
+
+    /**
+     * Use a separate directory for each image.
+     *
+     * <p>Rationale: If a user creates multiple jlink artifacts using classifiers,
+     * the directories should not overwrite themselves for each execution.</p>
+     */
+    private void setOutputDirectoryImage()
+    {
+        if ( hasClassifier() )
+        {
+            final File classifiersDirectory = new File( outputDirectoryImage, "classifiers" );
+            outputDirectoryImage = new File( classifiersDirectory, classifier );
+        }
+        else
+        {
+            outputDirectoryImage = new File( outputDirectoryImage, "default" );
         }
     }
 
@@ -633,4 +693,13 @@ public class JLinkMojo
     {
         return limitModules != null && !limitModules.isEmpty();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String getClassifier()
+    {
+        return classifier;
+    }
+
 }
