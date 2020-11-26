@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -49,7 +50,6 @@ import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
 import org.codehaus.plexus.languages.java.jpms.LocationManager;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
-import org.codehaus.plexus.util.FileUtils;
 
 /**
  * The JLink goal is intended to create a Java Run Time Image file based on
