@@ -59,6 +59,12 @@ public abstract class AbstractJLinkMojo
     @Component
     private ToolchainManager toolchainManager;
 
+    /**
+     * Overload this to produce a zip with another classifier, for example a jlink-zip.
+     * @return get the classifier.
+     */
+    protected abstract String getClassifier();
+
     protected JLinkExecutor getJlinkExecutor()
     {
         return new JLinkExecutor( getToolchain().orElse( null ), getLog() );
@@ -167,7 +173,7 @@ public abstract class AbstractJLinkMojo
     protected boolean hasClassifier( String classifier )
     {
         boolean result = false;
-        if ( classifier != null && classifier.trim().length() > 0 )
+        if ( classifier != null && !classifier.isEmpty() )
         {
             result = true;
         }
