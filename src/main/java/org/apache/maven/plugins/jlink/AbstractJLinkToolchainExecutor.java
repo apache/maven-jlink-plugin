@@ -19,6 +19,7 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -26,7 +27,6 @@ import org.apache.maven.shared.utils.cli.CommandLineException;
 import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -114,7 +114,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
 
         String jLinkExecutable = toolchain.orElseThrow( NoSuchElementException::new ).findTool( "jlink" );
 
-        if ( StringUtils.isEmpty( jLinkExecutable ) )
+        if ( jLinkExecutable.isEmpty() )
         {
             throw new IllegalStateException( "The jlink executable '"
                     + jLinkExecutable + "' doesn't exist or is not a file." );
