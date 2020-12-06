@@ -22,11 +22,12 @@ package org.apache.maven.plugins.jlink;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.utils.cli.CommandLineException;
 import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.Toolchain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
@@ -35,11 +36,11 @@ import java.util.Optional;
 
 abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( AbstractJLinkToolchainExecutor.class );
     private final Toolchain toolchain;
 
-    AbstractJLinkToolchainExecutor( Toolchain toolchain, Log log )
+    AbstractJLinkToolchainExecutor( Toolchain toolchain )
     {
-        super( log );
         this.toolchain = toolchain;
     }
 
@@ -57,7 +58,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
     public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
     {
         File jlinkExecutable = getJlinkExecutable();
-        getLog().info( "Toolchain in maven-jlink-plugin: jlink [ " + jlinkExecutable + " ]" );
+        LOGGER.info( "Toolchain in maven-jlink-plugin: jlink [ " + jlinkExecutable + " ]" );
 
         Commandline cmd = createJLinkCommandLine( jlinkArgs );
         cmd.setExecutable( jlinkExecutable.getAbsolutePath() );
@@ -85,8 +86,8 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
             jmodsFolder = new File( jLinkParent, JMODS );
         }
 
-        getLog().debug( " Parent: " + jLinkParent.getAbsolutePath() );
-        getLog().debug( " jmodsFolder: " + jmodsFolder.getAbsolutePath() );
+        LOGGER.debug( " Parent: " + jLinkParent.getAbsolutePath() );
+        LOGGER.debug( " jmodsFolder: " + jmodsFolder.getAbsolutePath() );
 
         return Optional.of( jmodsFolder );
     }
@@ -105,9 +106,9 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
 
         if ( !toolchain.isPresent() )
         {
-            getLog().error( "Either JDK9+ or a toolchain "
+            LOGGER.error( "Either JDK9+ or a toolchain "
                     + "pointing to a JDK9+ containing a jlink binary is required." );
-            getLog().info( "See https://maven.apache.org/guides/mini/guide-using-toolchains.html "
+            LOGGER.info( "See https://maven.apache.org/guides/mini/guide-using-toolchains.html "
                     + "for mor information." );
             throw new IllegalStateException( "Running on JDK8 and no toolchain found." );
         }
@@ -146,10 +147,10 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
     private int executeCommand( Commandline cmd )
             throws MojoExecutionException
     {
-        if ( getLog().isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
             // no quoted arguments ???
-            getLog().debug( CommandLineUtils.toString( cmd.getCommandline() ).replaceAll( "'", "" ) );
+            LOGGER.debug( CommandLineUtils.toString( cmd.getCommandline() ).replaceAll( "'", "" ) );
         }
 
         CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
@@ -166,10 +167,10 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
                 if ( StringUtils.isNotEmpty( output ) )
                 {
                     // Reconsider to use WARN / ERROR ?
-                    //  getLog().error( output );
+                    //  LOGGER.error( output );
                     for ( String outputLine : output.split( "\n" ) )
                     {
-                        getLog().error( outputLine );
+                        LOGGER.error( outputLine );
                     }
                 }
 
@@ -187,10 +188,9 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
 
             if ( StringUtils.isNotEmpty( output ) )
             {
-                //getLog().info( output );
                 for ( String outputLine : output.split( "\n" ) )
                 {
-                    getLog().info( outputLine );
+                    LOGGER.info( outputLine );
                 }
             }
 

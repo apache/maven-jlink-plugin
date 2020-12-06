@@ -50,6 +50,8 @@ import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
 import org.codehaus.plexus.languages.java.jpms.LocationManager;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The JLink goal is intended to create a Java Run Time Image file based on
@@ -64,6 +66,8 @@ import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
 public class JLinkMojo
     extends AbstractJLinkMojo
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger( JLinkMojo.class );
+
     @Component
     private LocationManager locationManager;
 
@@ -295,7 +299,7 @@ public class JLinkMojo
 
         for ( Entry<String, File> item : getModulePathElements().entrySet() )
         {
-            getLog().info( " -> module: " + item.getKey() + " ( " + item.getValue().getPath() + " )" );
+            LOGGER.info( " -> module: " + item.getKey() + " ( " + item.getValue().getPath() + " )" );
 
             // We use the real module name and not the artifact Id...
             modulesToAdd.add( item.getKey() );
@@ -336,7 +340,7 @@ public class JLinkMojo
 
         for ( Artifact a : project.getArtifacts() )
         {
-            getLog().debug( "Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion() );
+            LOGGER.debug( "Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion() );
             list.add( a.getFile() );
         }
         return list;
@@ -373,16 +377,16 @@ public class JLinkMojo
                 {
                     String message = "The given dependency " + entry.getKey()
                         + " does not have a module-info.java file. So it can't be linked.";
-                    getLog().error( message );
+                    LOGGER.error( message );
                     throw new MojoFailureException( message );
                 }
 
                 // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug( " module: " + entry.getValue().name() + " automatic: "
+                LOGGER.debug( " module: " + entry.getValue().name() + " automatic: "
                     + entry.getValue().isAutomatic() );
                 if ( modulepathElements.containsKey( entry.getValue().name() ) )
                 {
-                    getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                    LOGGER.warn( "The module name " + entry.getValue().name() + " does already exists." );
                 }
                 modulepathElements.put( entry.getValue().name(), entry.getKey() );
             }
@@ -402,12 +406,12 @@ public class JLinkMojo
                     {
                         String message = "The given project " + entry.getKey()
                             + " does not contain a module-info.java file. So it can't be linked.";
-                        getLog().error( message );
+                        LOGGER.error( message );
                         throw new MojoFailureException( message );
                     }
                     if ( modulepathElements.containsKey( entry.getValue().name() ) )
                     {
-                        getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                        LOGGER.warn( "The module name " + entry.getValue().name() + " does already exists." );
                     }
                     modulepathElements.put( entry.getValue().name(), entry.getKey() );
                 }
@@ -416,7 +420,7 @@ public class JLinkMojo
         }   
         catch ( IOException e )
         {
-            getLog().error( e.getMessage() );
+            LOGGER.error( e.getMessage() );
             throw new MojoFailureException( e.getMessage() );
         }
 
@@ -454,12 +458,12 @@ public class JLinkMojo
         }
         catch ( ArchiverException e )
         {
-            getLog().error( e.getMessage(), e );
+            LOGGER.error( e.getMessage(), e );
             throw new MojoExecutionException( e.getMessage(), e );
         }
         catch ( IOException e )
         {
-            getLog().error( e.getMessage(), e );
+            LOGGER.error( e.getMessage(), e );
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
@@ -473,7 +477,7 @@ public class JLinkMojo
         if ( compress != null && ( compress < 0 || compress > 2 ) )
         {
             String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
-            getLog().error( message );
+            LOGGER.error( message );
             throw new MojoFailureException( message );
         }
 
@@ -481,7 +485,7 @@ public class JLinkMojo
         {
             String message = "The given endian parameter " + endian
                     + " does not contain one of the following values: 'little' or 'big'.";
-            getLog().error( message );
+            LOGGER.error( message );
             throw new MojoFailureException( message );
         }
     }
@@ -495,12 +499,12 @@ public class JLinkMojo
             // otherwise JLink will fail with a message "Error: directory already exists: ..."
             try
             {
-                getLog().debug( "Deleting existing " + outputDirectoryImage.getAbsolutePath() );
+                LOGGER.debug( "Deleting existing " + outputDirectoryImage.getAbsolutePath() );
                 FileUtils.forceDelete( outputDirectoryImage );
             }
             catch ( IOException e )
             {
-                getLog().error( "IOException", e );
+                LOGGER.error( "IOException", e );
                 throw new MojoExecutionException( "Failure during deletion of " + outputDirectoryImage.getAbsolutePath()
                     + " occured." );
             }

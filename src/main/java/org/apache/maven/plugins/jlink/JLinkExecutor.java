@@ -19,7 +19,6 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
 
 /**
@@ -29,9 +28,9 @@ import org.apache.maven.toolchain.Toolchain;
  */
 class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
-    JLinkExecutor( Toolchain toolchain, Log log )
+    JLinkExecutor( Toolchain toolchain )
     {
-        super( toolchain, log );
+        super( toolchain );
     }
 
 }

@@ -61,7 +61,7 @@ public abstract class AbstractJLinkMojo
 
     protected JLinkExecutor getJlinkExecutor()
     {
-        return new JLinkExecutor( getToolchain().orElse( null ), getLog() );
+        return new JLinkExecutor( getToolchain().orElse( null ) );
     }
 
     protected Optional<Toolchain> getToolchain()

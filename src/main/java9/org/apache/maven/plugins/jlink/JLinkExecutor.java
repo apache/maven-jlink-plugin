@@ -21,8 +21,9 @@ package org.apache.maven.plugins.jlink;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,11 +41,12 @@ import java.util.spi.ToolProvider;
  */
 class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JLinkExecutor.class);
     private final ToolProvider toolProvider;
 
-    JLinkExecutor( Toolchain toolchain, Log log ) throws IOException
+    JLinkExecutor( Toolchain toolchain) throws IOException
     {
-        super( toolchain, log );
+        super( toolchain );
         this.toolProvider = getJLinkExecutable();
     }
 
@@ -63,10 +65,10 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
             return super.executeJlink( jlinkArgs );
         }
 
-        if ( getLog().isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
             // no quoted arguments ???
-            getLog().debug( this.toolProvider.name() + " " + jlinkArgs );
+            LOGGER.debug( this.toolProvider.name() + " " + jlinkArgs );
         }
 
         try ( ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
@@ -86,10 +88,10 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
                 if ( StringUtils.isNotEmpty( output ) )
                 {
                     // Reconsider to use WARN / ERROR ?
-                    //  getLog().error( output );
+                    //  LOGGER.error( output );
                     for ( String outputLine : output.split( "\n" ) )
                     {
-                        getLog().error( outputLine );
+                        LOGGER.error( outputLine );
                     }
                 }
 
@@ -109,10 +111,9 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
 
             if ( StringUtils.isNotEmpty( output ) )
             {
-                //getLog().info( output );
                 for ( String outputLine : output.split( "\n" ) )
                 {
-                    getLog().info( outputLine );
+                    LOGGER.info( outputLine );
                 }
             }
 

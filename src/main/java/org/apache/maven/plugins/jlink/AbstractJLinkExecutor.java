@@ -20,7 +20,6 @@ package org.apache.maven.plugins.jlink;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,20 +31,9 @@ abstract class AbstractJLinkExecutor
 {
     protected static final String JMODS = "jmods";
 
-    private final Log log;
 
     private final List<String> modulesToAdd = new ArrayList<>();
     private final List<String> modulePaths = new ArrayList<>();
-
-    AbstractJLinkExecutor( Log log )
-    {
-        this.log = log;
-    }
-
-    protected Log getLog()
-    {
-        return this.log;
-    }
 
     public abstract Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules );
 
