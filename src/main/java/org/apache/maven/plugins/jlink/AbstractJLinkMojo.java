@@ -91,15 +91,7 @@ public abstract class AbstractJLinkMojo
                     tc = tcs.get( 0 );
                 }
             }
-            catch ( ReflectiveOperationException e )
-            {
-                // ignore
-            }
-            catch ( SecurityException e )
-            {
-                // ignore
-            }
-            catch ( IllegalArgumentException e )
+            catch ( ReflectiveOperationException | SecurityException | IllegalArgumentException e )
             {
                 // ignore
             }
@@ -213,16 +205,7 @@ public abstract class AbstractJLinkMojo
      */
     protected String getPlatformDependSeparateList( Collection<String> modulePaths )
     {
-        StringBuilder sb = new StringBuilder();
-        for ( String module : modulePaths )
-        {
-            if ( sb.length() > 0 )
-            {
-                sb.append( File.pathSeparatorChar );
-            }
-            sb.append( module );
-        }
-        return sb.toString();
+        return String.join( Character.toString( File.pathSeparatorChar ), modulePaths );
     }
 
     /**
@@ -232,16 +215,7 @@ public abstract class AbstractJLinkMojo
      */
     protected String getCommaSeparatedList( Collection<String> modules )
     {
-        StringBuilder sb = new StringBuilder();
-        for ( String module : modules )
-        {
-            if ( sb.length() > 0 )
-            {
-                sb.append( ',' );
-            }
-            sb.append( module );
-        }
-        return sb.toString();
+        return String.join( ",", modules );
     }
 
 }

@@ -52,7 +52,7 @@ public class AbstractJLinkMojoTest
     public void convertShouldReturnSingleCharacter()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x" );
-        assertThat( result.toString() ).isNotEmpty().isEqualTo( "x" );
+        assertThat( result ).isNotEmpty().hasToString( "x" );
     }
 
     @Test
@@ -60,7 +60,7 @@ public class AbstractJLinkMojoTest
     public void convertShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x;a" );
-        assertThat( result.toString() ).isEqualTo( "x" + File.pathSeparatorChar + "a" );
+        assertThat( result ).hasToString( "x" + File.pathSeparatorChar + "a" );
     }
 
     @Test
@@ -68,7 +68,7 @@ public class AbstractJLinkMojoTest
     public void convertUsingDifferentDelimiterShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x:a" );
-        assertThat( result.toString() ).isEqualTo( "x" + File.pathSeparatorChar + "a" );
+        assertThat( result ).hasToString( "x" + File.pathSeparatorChar + "a" );
     }
 
     @Test
@@ -77,7 +77,7 @@ public class AbstractJLinkMojoTest
     public void convertUsingMultipleDelimitersShouldReturnTwoCharactersSeparatedByPathSeparator()
     {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath( "x:a::" );
-        assertThat( result.toString() ).isEqualTo( "x" + File.pathSeparatorChar + "a" );
+        assertThat( result ).hasToString( "x" + File.pathSeparatorChar + "a" );
     }
 
     @Test
@@ -108,7 +108,7 @@ public class AbstractJLinkMojoTest
     @DisplayName( "getCommaSeparatedList() should return a single character" )
     public void getCommaSeparatedListShouldReturnASingleCharacter()
     {
-        String result = mojoMock.getCommaSeparatedList( Arrays.asList( "A" ) );
+        String result = mojoMock.getCommaSeparatedList( Collections.singletonList( "A" ) );
         assertThat( result ).isEqualTo( "A" );
     }
 

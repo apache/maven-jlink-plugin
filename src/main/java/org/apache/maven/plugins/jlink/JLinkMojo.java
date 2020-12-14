@@ -59,9 +59,7 @@ import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
-// CHECKSTYLE_OFF: LineLength
-@Mojo( name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE, requiresProject = true )
-// CHECKSTYLE_ON: LineLength
+@Mojo( name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE )
 public class JLinkMojo
     extends AbstractJLinkMojo
 {
@@ -359,7 +357,7 @@ public class JLinkMojo
 
     private List<File> getCompileClasspathElements( MavenProject project )
     {
-        List<File> list = new ArrayList<File>( project.getArtifacts().size() + 1 );
+        List<File> list = new ArrayList<>( project.getArtifacts().size() + 1 );
 
         for ( Artifact a : project.getArtifacts() )
         {
@@ -396,7 +394,8 @@ public class JLinkMojo
 
             for ( Map.Entry<File, JavaModuleDescriptor> entry : resolvePathsResult.getPathElements().entrySet() )
             {
-                if ( entry.getValue() == null )
+                JavaModuleDescriptor descriptor = entry.getValue();
+                if ( descriptor == null )
                 {
                     String message = "The given dependency " + entry.getKey()
                         + " does not have a module-info.java file. So it can't be linked.";
@@ -405,13 +404,12 @@ public class JLinkMojo
                 }
 
                 // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug( " module: " + entry.getValue().name() + " automatic: "
-                    + entry.getValue().isAutomatic() );
-                if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                getLog().debug( " module: " + descriptor.name() + " automatic: " + descriptor.isAutomatic() );
+                if ( modulepathElements.containsKey( descriptor.name() ) )
                 {
-                    getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                    getLog().warn( "The module name " + descriptor.name() + " does already exists." );
                 }
-                modulepathElements.put( entry.getValue().name(), entry.getKey() );
+                modulepathElements.put( descriptor.name(), entry.getKey() );
             }
 
             // This part is for the module in target/classes ? (Hacky..)
@@ -425,22 +423,23 @@ public class JLinkMojo
                 ResolvePathsResult<File> resolvePaths = locationManager.resolvePaths( singleModuls );
                 for ( Entry<File, JavaModuleDescriptor> entry : resolvePaths.getPathElements().entrySet() )
                 {
-                    if ( entry.getValue() == null )
+                    JavaModuleDescriptor descriptor = entry.getValue();
+                    if ( descriptor == null )
                     {
                         String message = "The given project " + entry.getKey()
                             + " does not contain a module-info.java file. So it can't be linked.";
                         getLog().error( message );
                         throw new MojoFailureException( message );
                     }
-                    if ( modulepathElements.containsKey( entry.getValue().name() ) )
+                    if ( modulepathElements.containsKey( descriptor.name() ) )
                     {
-                        getLog().warn( "The module name " + entry.getValue().name() + " does already exists." );
+                        getLog().warn( "The module name " + descriptor.name() + " does already exists." );
                     }
-                    modulepathElements.put( entry.getValue().name(), entry.getKey() );
+                    modulepathElements.put( descriptor.name(), entry.getKey() );
                 }
             }
 
-        }   
+        }
         catch ( IOException e )
         {
             getLog().error( e.getMessage() );
@@ -493,12 +492,7 @@ public class JLinkMojo
         {
             zipArchiver.createArchive();
         }
-        catch ( ArchiverException e )
-        {
-            getLog().error( e.getMessage(), e );
-            throw new MojoExecutionException( e.getMessage(), e );
-        }
-        catch ( IOException e )
+        catch ( ArchiverException | IOException e )
         {
             getLog().error( e.getMessage(), e );
             throw new MojoExecutionException( e.getMessage(), e );
