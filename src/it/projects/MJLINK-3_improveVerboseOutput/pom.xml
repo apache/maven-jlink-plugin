@@ -39,7 +39,7 @@
       <!-- use a dependency with a module-info.class -->
       <artifactId>asm</artifactId>
       <groupId>org.ow2.asm</groupId>
-      <version>6.0</version>
+      <version>9.0</version>
     </dependency>
   </dependencies>
 
