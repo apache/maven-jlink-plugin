@@ -24,12 +24,7 @@ import java.util.jar.*
 import org.codehaus.plexus.util.*
 
 String buildlog = new File( basedir, "build.log").text
-assert buildlog.contains( "--add-options" )
-assert buildlog.contains( "\"-Xmx128m --enable-preview -Dvar=value\"" )
+assert buildlog.contains( "org.apache.maven.plugin.MojoFailureException" )
+assert buildlog.contains( "needs at least a Java 14" )
 
-File target = new File( basedir, "target" )
-assert target.isDirectory()
-
-File artifact = new File( target, "maven-jlink-plugin-cli-options-add-options-101.0.zip" )
-assert artifact.isFile()
 

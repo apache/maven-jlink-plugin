@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,18 +17,5 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
-import java.util.jar.*
-import org.codehaus.plexus.util.*
-
-String buildlog = new File( basedir, "build.log").text
-assert buildlog.contains( "--add-options" )
-assert buildlog.contains( "\"-Xmx128m --enable-preview -Dvar=value\"" )
-
-File target = new File( basedir, "target" )
-assert target.isDirectory()
-
-File artifact = new File( target, "maven-jlink-plugin-cli-options-add-options-101.0.zip" )
-assert artifact.isFile()
-
+Test configuration file which should be located in config/config.test in
+resulting jmod file.
