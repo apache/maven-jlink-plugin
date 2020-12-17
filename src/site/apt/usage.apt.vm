@@ -60,7 +60,7 @@ Usage
 +-----
 
   The configuration element contains the configuration for the plugin 
-  {{{https://maven.apache.org/guides/mini/guide-configuring-plugins.html}}like any other Maven plugin}}.
+  {{{https://maven.apache.org/guides/mini/guide-configuring-plugins.html}like any other Maven plugin}}.
   The different elements which can be configured for this plugin can identified by the
   {{{./plugin-info.html}goals documentation}}.
 
@@ -76,11 +76,15 @@ Usage
  
 * Usage of the Maven JLink Plugin
 
-  Usually you will use the Maven JLink Plugin to create a Run Time Image from one or more modules within 
-  a multi module build.
-  In other words it is not possible to create a Run Time Image from a single Maven
-  Project within the same single Maven Project.
-  Let us assume you have a multi module structure which contains two modules <<mod-1>> and <<mod-2>> 
+  You can use the maven-jlink-plugin the same way you use the maven-jar-plugin, maven-war-plugin,
+  maven-assembly-plugin or any other artifact-generating plugin.
+  Create a separate module for the artifact generation and specify
+  <<< <packaging>jlink</packaging> >>>.
+
+  Another way to use this plugin is to add it to an existing project.
+  In this case you want to add an explicit execution in the <<<package>>> phase.
+
+  Let’s assume you have a multi module structure that contains two modules <<mod-1>> and <<mod-2>>
   which you like to put into the resulting Run Time Image.
 
   The parent of the multi module looks similar like this:  
