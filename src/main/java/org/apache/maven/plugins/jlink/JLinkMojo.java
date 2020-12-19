@@ -58,8 +58,8 @@ import static java.util.Collections.singletonMap;
 
 /**
  * The JLink goal is intended to create a Java Run Time Image file based on
- * <a href="http://openjdk.java.net/jeps/282">http://openjdk.java.net/jeps/282</a>,
- * <a href="http://openjdk.java.net/jeps/220">http://openjdk.java.net/jeps/220</a>.
+ * <a href="https://openjdk.java.net/jeps/282">https://openjdk.java.net/jeps/282</a>,
+ * <a href="https://openjdk.java.net/jeps/220">https://openjdk.java.net/jeps/220</a>.
  * 
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */

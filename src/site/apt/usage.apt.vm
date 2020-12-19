@@ -27,7 +27,7 @@ Usage
 
 * Introduction
 
-  The Maven JLink plugin is used to create {{{http://openjdk.java.net/jeps/220}Modular Run-Time Images}} with
+  The Maven JLink plugin is used to create {{{https://openjdk.java.net/jeps/220}Modular Run-Time Images}} with
   JDK 9.
   
   The intended artifacts to be linked together into a Modular Run-Time Image 

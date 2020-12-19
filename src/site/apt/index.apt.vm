@@ -28,8 +28,8 @@
 
 ${project.name}
 
-  The JLink Plugin is intended to create a {{{http://openjdk.java.net/jeps/220}Modular Java Run-Time Images}}
-  via {{{http://openjdk.java.net/jeps/282}jlink}}.
+  The JLink Plugin is intended to create a {{{https://openjdk.java.net/jeps/220}Modular Java Run-Time Images}}
+  via {{{https://openjdk.java.net/jeps/282}jlink}}.
     
 * Goals Overview
 
