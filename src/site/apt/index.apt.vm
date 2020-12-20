@@ -62,8 +62,6 @@ ${project.name}
 * Examples
 
   To provide you with better understanding on some usages of the Maven JLink Plugin,
-  you can take a look into the following examples:
-
-  TODO: Add examples.
+  you can take a look into the following {{{./usage.html}examples}}
 
   []
