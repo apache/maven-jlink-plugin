@@ -69,7 +69,6 @@
     <mavenVersion>3.1.1</mavenVersion>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <mavenPluginToolsVersion>3.6.0</mavenPluginToolsVersion><!-- remove with upgrade to parent-pom 35 -->
     <project.build.outputTimestamp>2020-11-11T21:56:48Z</project.build.outputTimestamp>
   </properties>
 
