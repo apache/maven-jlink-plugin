@@ -69,6 +69,7 @@
     <mavenVersion>3.1.1</mavenVersion>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <mavenPluginToolsVersion>3.6.0</mavenPluginToolsVersion><!-- remove with upgrade to parent-pom 35 -->
     <project.build.outputTimestamp>2020-11-11T21:56:48Z</project.build.outputTimestamp>
   </properties>
 
@@ -82,6 +83,16 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
     <dependency>
@@ -142,6 +153,11 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>2.1.0</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>5.7.0</version>
@@ -154,6 +170,23 @@
   <build>
     <pluginManagement>
       <plugins>
+        <!-- remove with next parent upgrade -->
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.0.0-M3</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.9.1</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
