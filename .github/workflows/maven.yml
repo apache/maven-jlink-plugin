@@ -24,8 +24,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'Ubuntu-20.04', windows-latest ]
-        java: [ 8, 11, 15 ]
+        os: [ ubuntu-latest, windows-latest, macOS-latest ]
+        java: [ 8, 11, 16-ea, 17-ea ]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -74,5 +74,5 @@ jobs:
           java-version: ${{ matrix.java }}
 
       - name: Build with Maven
-        run: mvn verify -e -B -V -Prun-its
+        run: mvn verify -e -B -V -ntp -Prun-its
 
