@@ -106,7 +106,7 @@ public class JLinkMojo
      * These JVM arguments will be appended to the {@code lib/modules} file.<br>
      * <strong>This parameter requires at least JDK 14.<br></strong>
      *
-     * <p>The command line equivalent is: {@code jlink --add-options="…"}.</p>
+     * <p>The command line equivalent is: {@code jlink --add-options="..."}.</p>
      *
      * <p>Example:</p>
      *
