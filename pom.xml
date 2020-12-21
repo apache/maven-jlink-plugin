@@ -30,7 +30,7 @@
   </parent>
 
   <artifactId>maven-jlink-plugin</artifactId>
-  <version>3.1.0</version>
+  <version>3.1.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven JLink Plugin</name>
@@ -46,7 +46,7 @@
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</developerConnection>
     <url>https://github.com/apache/maven-jlink-plugin/tree/${project.scm.tag}</url>
-    <tag>maven-jlink-plugin-3.1.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
@@ -69,7 +69,7 @@
     <mavenVersion>3.1.1</mavenVersion>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.outputTimestamp>2020-12-21T12:52:07Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2020-12-21T12:52:28Z</project.build.outputTimestamp>
   </properties>
 
   <dependencies>
