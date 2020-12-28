@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
@@ -69,16 +70,16 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
             getLog().debug( this.toolProvider.name() + " " + jlinkArgs );
         }
 
-        try ( ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
-              PrintWriter err = new PrintWriter( baosErr );
-              ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-              PrintWriter out = new PrintWriter( baosOut ) )
+        try ( StringWriter strErr = new StringWriter();
+              PrintWriter err = new PrintWriter( strErr );
+              StringWriter strOut = new StringWriter();
+              PrintWriter out = new PrintWriter( strOut ) )
         {
             int exitCode = this.toolProvider.run( out, err, jlinkArgs.toArray( new String[0] ) );
             out.flush();
             err.flush();
 
-            String outAsString = baosOut.toString( "UTF-8" );
+            String outAsString = strOut.toString();
             String output = ( StringUtils.isEmpty( outAsString ) ? null : '\n' + outAsString.trim() );
 
             if ( exitCode != 0 )
@@ -95,7 +96,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
 
                 StringBuilder msg = new StringBuilder( "\nExit code: " );
                 msg.append( exitCode );
-                String errAsString = baosErr.toString();
+                String errAsString = strErr.toString();
                 if ( StringUtils.isNotEmpty( errAsString ) )
                 {
                     msg.append( " - " ).append( errAsString );
