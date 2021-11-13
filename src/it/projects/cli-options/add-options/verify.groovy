@@ -25,7 +25,7 @@ import org.codehaus.plexus.util.*
 
 String buildlog = new File( basedir, "build.log").text
 assert buildlog.contains( "--add-options" )
-assert buildlog.contains( "\"-Xmx128m --enable-preview -Dvar=value\"" )
+assert buildlog.contains( "-Xmx128m --enable-preview -Dvar=value" )
 
 File target = new File( basedir, "target" )
 assert target.isDirectory()

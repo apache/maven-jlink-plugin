@@ -108,6 +108,8 @@ public class JLinkMojo
      *
      * <p>The command line equivalent is: {@code jlink --add-options="..."}.</p>
      *
+     * Spaces in options are not supported, they will be treated as separate options.
+     *
      * <p>Example:</p>
      *
      * <pre>
@@ -654,7 +656,7 @@ public class JLinkMojo
         if ( addOptions != null && !addOptions.isEmpty() )
         {
             jlinkArgs.add( "--add-options" );
-            jlinkArgs.add( String.format( "\"%s\"", String.join( " ", addOptions ) ) );
+            jlinkArgs.add( String.format( "%s", String.join( " ", addOptions ) ) );
         }
 
         if ( disablePlugin != null )
