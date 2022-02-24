@@ -20,9 +20,8 @@
 package org.apache.maven.plugins.jlink;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.api.Toolchain;
+import org.apache.maven.api.plugin.MojoException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,9 +42,9 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
     private final ToolProvider toolProvider;
 
-    JLinkExecutor( Toolchain toolchain, Log log ) throws IOException
+    JLinkExecutor( Toolchain toolchain ) throws IOException
     {
-        super( toolchain, log );
+        super( toolchain );
         this.toolProvider = getJLinkExecutable();
     }
 
@@ -57,7 +56,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
     }
 
     @Override
-    public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
+    public int executeJlink( List<String> jlinkArgs ) throws MojoException
     {
         if (getToolchain().isPresent())
         {
@@ -105,7 +104,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
                 msg.append( "Command line was: " ).append( this.toolProvider.name() ).append( ' ' ).append(
                         jlinkArgs ).append( '\n' ).append( '\n' );
 
-                throw new MojoExecutionException( msg.toString() );
+                throw new MojoException( msg.toString() );
             }
 
             if ( StringUtils.isNotEmpty( output ) )
@@ -121,7 +120,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
         }
         catch ( IOException e )
         {
-            throw new MojoExecutionException( "Unable to execute jlink command: " + e.getMessage(), e );
+            throw new MojoException( "Unable to execute jlink command: " + e.getMessage(), e );
         }
     }
 

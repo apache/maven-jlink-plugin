@@ -21,12 +21,11 @@ package org.apache.maven.plugins.jlink;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.api.Toolchain;
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.shared.utils.cli.CommandLineException;
 import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
-import org.apache.maven.toolchain.Toolchain;
 
 import java.io.File;
 import java.util.List;
@@ -37,9 +36,9 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
 {
     private final Toolchain toolchain;
 
-    AbstractJLinkToolchainExecutor( Toolchain toolchain, Log log )
+    AbstractJLinkToolchainExecutor( Toolchain toolchain )
     {
-        super( log );
+        super();
         this.toolchain = toolchain;
     }
 
@@ -54,7 +53,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
      * @return the exit code ({@code 0} on success).
      */
     @Override
-    public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
+    public int executeJlink( List<String> jlinkArgs ) throws MojoException
     {
         File jlinkExecutable = getJlinkExecutable();
         getLog().info( "Toolchain in maven-jlink-plugin: jlink [ " + jlinkExecutable + " ]" );
@@ -144,7 +143,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
     }
 
     private int executeCommand( Commandline cmd )
-            throws MojoExecutionException
+            throws MojoException
     {
         if ( getLog().isDebugEnabled() )
         {
@@ -182,7 +181,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
                 msg.append( '\n' );
                 msg.append( "Command line was: " ).append( cmd ).append( '\n' ).append( '\n' );
 
-                throw new MojoExecutionException( msg.toString() );
+                throw new MojoException( msg.toString() );
             }
 
             if ( StringUtils.isNotEmpty( output ) )
@@ -198,7 +197,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
         }
         catch ( CommandLineException e )
         {
-            throw new MojoExecutionException( "Unable to execute jlink command: " + e.getMessage(), e );
+            throw new MojoException( "Unable to execute jlink command: " + e.getMessage(), e );
         }
     }
 }

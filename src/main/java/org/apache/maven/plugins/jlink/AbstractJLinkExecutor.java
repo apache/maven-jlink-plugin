@@ -19,8 +19,6 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,28 +26,31 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.api.plugin.MojoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 abstract class AbstractJLinkExecutor
 {
     protected static final String JMODS = "jmods";
 
-    private final Log log;
+    private final Logger log = LoggerFactory.getLogger( getClass() );
 
     private final List<String> modulesToAdd = new ArrayList<>();
     private final List<String> modulePaths = new ArrayList<>();
 
-    AbstractJLinkExecutor( Log log )
+    AbstractJLinkExecutor()
     {
-        this.log = log;
     }
 
-    protected Log getLog()
+    protected Logger getLog()
     {
         return this.log;
     }
 
     public abstract Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules );
 
-    public abstract int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException;
+    public abstract int executeJlink( List<String> jlinkArgs ) throws MojoException;
 
     public void addAllModules( Collection<String> modulesToAdd )
     {

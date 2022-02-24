@@ -21,13 +21,11 @@ package org.apache.maven.plugins.jlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,7 +42,6 @@ public class AbstractJLinkMojoTest
     public void before()
     {
         this.mojoMock = mock( AbstractJLinkMojo.class, Mockito.CALLS_REAL_METHODS );
-        when( mojoMock.getLog() ).thenReturn( mock( Log.class ) );
     }
 
     @Test

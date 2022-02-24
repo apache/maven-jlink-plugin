@@ -21,6 +21,7 @@ package org.apache.maven.plugins.jlink;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,22 +30,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
-import org.apache.maven.toolchain.Toolchain;
-import org.apache.maven.toolchain.ToolchainPrivate;
-import org.apache.maven.toolchain.java.DefaultJavaToolChain;
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.JavaToolchain;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Toolchain;
+import org.apache.maven.api.plugin.MojoException;
+import org.apache.maven.api.plugin.annotations.Component;
+import org.apache.maven.api.plugin.annotations.LifecyclePhase;
+import org.apache.maven.api.plugin.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Parameter;
+import org.apache.maven.api.plugin.annotations.ResolutionScope;
+import org.apache.maven.api.services.ProjectManager;
 import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -312,10 +312,10 @@ public class JLinkMojo
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
     @Component
-    private MavenProjectHelper projectHelper;
+    private ProjectManager projectManager;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
+    public void execute() throws MojoException
     {
         failIfParametersAreNotInTheirValidValueRanges();
 
@@ -360,40 +360,36 @@ public class JLinkMojo
         }
         catch ( IllegalStateException e )
         {
-            throw new MojoFailureException( "Unable to find jlink command: " + e.getMessage(), e );
+            throw new MojoException( "Unable to find jlink command: " + e.getMessage(), e );
         }
 
-        File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
+        Path createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
 
-        if ( hasClassifier() )
+        if ( !hasClassifier() && projectHasAlreadySetAnArtifact() )
         {
-            projectHelper.attachArtifact( getProject(), "jlink", getClassifier(), createZipArchiveFromImage );
+            throw new MojoException( "You have to use a classifier "
+                    + "to attach supplemental artifacts to the project instead of replacing them." );
         }
-        else
-        {
-            if ( projectHasAlreadySetAnArtifact() )
-            {
-                throw new MojoExecutionException( "You have to use a classifier "
-                        + "to attach supplemental artifacts to the project instead of replacing them." );
-            }
-            getProject().getArtifact().setFile( createZipArchiveFromImage );
-        }
+        projectManager.attachArtifact( getProject(), "jlink", getClassifier(), createZipArchiveFromImage );
     }
 
-    private List<File> getCompileClasspathElements( MavenProject project )
+    private List<File> getCompileClasspathElements( Project project )
     {
-        List<File> list = new ArrayList<>( project.getArtifacts().size() + 1 );
+        List<Artifact> artifacts
+            = projectManager.getResolvedDependencies( project, ProjectManager.ResolutionScope.Runtime );
 
-        for ( Artifact a : project.getArtifacts() )
+        List<File> list = new ArrayList<>( artifacts.size() + 1 );
+
+        for ( Artifact a : artifacts )
         {
             getLog().debug( "Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion() );
-            list.add( a.getFile() );
+            list.add( a.getPath().get().toFile() );
         }
         return list;
     }
 
     private Map<String, File> getModulePathElements()
-        throws MojoFailureException
+        throws MojoException
     {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
         // and we can detect if auto modules are used. In that case, MavenProject.setFile() should not be used, so
@@ -409,10 +405,10 @@ public class JLinkMojo
 
             Optional<Toolchain> toolchain = getToolchain();
             if ( toolchain.isPresent()
-                    && toolchain.orElseThrow( NoSuchElementException::new ) instanceof DefaultJavaToolChain )
+                    && toolchain.get() instanceof JavaToolchain )
             {
                 Toolchain toolcahin1 = toolchain.orElseThrow( NoSuchElementException::new );
-                request.setJdkHome( new File( ( (DefaultJavaToolChain) toolcahin1 ).getJavaHome() ) );
+                request.setJdkHome( new File( ( (JavaToolchain) toolcahin1 ).getJavaHome() ) );
             }
 
             ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths( request );
@@ -425,7 +421,7 @@ public class JLinkMojo
                     String message = "The given dependency " + entry.getKey()
                         + " does not have a module-info.java file. So it can't be linked.";
                     getLog().error( message );
-                    throw new MojoFailureException( message );
+                    throw new MojoException( message );
                 }
 
                 // Don't warn for automatic modules, let the jlink tool do that
@@ -454,7 +450,7 @@ public class JLinkMojo
                         String message = "The given project " + entry.getKey()
                             + " does not contain a module-info.java file. So it can't be linked.";
                         getLog().error( message );
-                        throw new MojoFailureException( message );
+                        throw new MojoException( message );
                     }
                     if ( modulepathElements.containsKey( descriptor.name() ) )
                     {
@@ -468,7 +464,7 @@ public class JLinkMojo
         catch ( IOException e )
         {
             getLog().error( e.getMessage() );
-            throw new MojoFailureException( e.getMessage() );
+            throw new MojoException( e.getMessage() );
         }
 
         return modulepathElements;
@@ -481,14 +477,9 @@ public class JLinkMojo
 
     private boolean projectHasAlreadySetAnArtifact( )
     {
-        if ( getProject().getArtifact().getFile() != null )
-        {
-            return getProject().getArtifact().getFile().isFile();
-        }
-        else
-        {
-            return false;
-        }
+        return projectManager.getAttachedArtifacts( getProject() ).stream()
+                .anyMatch( a -> Objects.equals( a.getGroupId(), getProject().getGroupId() )
+                        && Objects.equals( a.getArtifactId(), getProject().getArtifactId() ) );
     }
 
     /**
@@ -505,8 +496,8 @@ public class JLinkMojo
         return result;
     }
 
-    private File createZipArchiveFromImage( File outputDirectory, File outputDirectoryImage )
-        throws MojoExecutionException
+    private Path createZipArchiveFromImage( File outputDirectory, File outputDirectoryImage )
+        throws MojoException
     {
         zipArchiver.addDirectory( outputDirectoryImage );
 
@@ -520,21 +511,21 @@ public class JLinkMojo
         catch ( ArchiverException | IOException e )
         {
             getLog().error( e.getMessage(), e );
-            throw new MojoExecutionException( e.getMessage(), e );
+            throw new MojoException( e.getMessage(), e );
         }
 
-        return resultArchive;
+        return resultArchive.toPath();
 
     }
 
     private void failIfParametersAreNotInTheirValidValueRanges()
-        throws MojoFailureException
+        throws MojoException
     {
         if ( compress != null && ( compress < 0 || compress > 2 ) )
         {
             String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
             getLog().error( message );
-            throw new MojoFailureException( message );
+            throw new MojoException( message );
         }
 
         if ( endian != null && ( !"big".equals( endian ) && !"little".equals( endian ) ) )
@@ -542,7 +533,7 @@ public class JLinkMojo
             String message = "The given endian parameter " + endian
                     + " does not contain one of the following values: 'little' or 'big'.";
             getLog().error( message );
-            throw new MojoFailureException( message );
+            throw new MojoException( message );
         }
 
         if ( addOptions != null && !addOptions.isEmpty() )
@@ -551,7 +542,7 @@ public class JLinkMojo
         }
     }
 
-    private void requireJdk14() throws MojoFailureException
+    private void requireJdk14() throws MojoException
     {
         // needs JDK 14+
         Optional<Toolchain> optToolchain = getToolchain();
@@ -559,21 +550,15 @@ public class JLinkMojo
 
         if ( optToolchain.isPresent() )
         {
-            Toolchain toolchain = optToolchain.orElseThrow( NoSuchElementException::new );
-            if ( !( toolchain instanceof ToolchainPrivate ) )
+            Toolchain toolchain = optToolchain.get();
+            if ( !toolchain.matchesRequirements( singletonMap( "jdk", "14" ) ) )
             {
-                getLog().warn( "Unable to check toolchain java version." );
-                return;
-            }
-            ToolchainPrivate toolchainPrivate = (ToolchainPrivate) toolchain;
-            if ( !toolchainPrivate.matchesRequirements( singletonMap( "jdk", "14" ) ) )
-            {
-                throw new MojoFailureException( java14reqMsg );
+                throw new MojoException( java14reqMsg );
             }
         }
         else if ( !JavaVersion.JAVA_VERSION.isAtLeast( "14" ) )
         {
-            throw new MojoFailureException( java14reqMsg );
+            throw new MojoException( java14reqMsg );
         }
     }
 
@@ -597,7 +582,7 @@ public class JLinkMojo
     }
 
     private void ifOutputDirectoryExistsDelteIt()
-        throws MojoExecutionException
+        throws MojoException
     {
         if ( outputDirectoryImage.exists() )
         {
@@ -611,7 +596,7 @@ public class JLinkMojo
             catch ( IOException e )
             {
                 getLog().error( "IOException", e );
-                throw new MojoExecutionException( "Failure during deletion of " + outputDirectoryImage.getAbsolutePath()
+                throw new MojoException( "Failure during deletion of " + outputDirectoryImage.getAbsolutePath()
                     + " occured." );
             }
         }

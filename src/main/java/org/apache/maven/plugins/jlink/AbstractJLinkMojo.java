@@ -26,19 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.toolchain.Toolchain;
-import org.apache.maven.toolchain.ToolchainManager;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.Toolchain;
+import org.apache.maven.api.plugin.annotations.Component;
+import org.apache.maven.api.plugin.annotations.Parameter;
+import org.apache.maven.api.services.ToolchainManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
 public abstract class AbstractJLinkMojo
-    extends AbstractMojo
+    implements org.apache.maven.api.plugin.Mojo
 {
     /**
      * <p>
@@ -51,13 +53,20 @@ public abstract class AbstractJLinkMojo
     private Map<String, String> jdkToolchain;
 
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
-    private MavenProject project;
+    private Project project;
 
     @Parameter( defaultValue = "${session}", readonly = true, required = true )
-    private MavenSession session;
+    private Session session;
 
     @Component
     private ToolchainManager toolchainManager;
+
+    private Logger logger = LoggerFactory.getLogger( getClass() );
+
+    protected Logger getLog()
+    {
+        return logger;
+    }
 
     /**
      * Overload this to produce a zip with another classifier, for example a jlink-zip.
@@ -67,7 +76,7 @@ public abstract class AbstractJLinkMojo
 
     protected JLinkExecutor getJlinkExecutor()
     {
-        return new JLinkExecutor( getToolchain().orElse( null ), getLog() );
+        return new JLinkExecutor( getToolchain().orElse( null ) );
     }
 
     protected Optional<Toolchain> getToolchain()
@@ -80,7 +89,7 @@ public abstract class AbstractJLinkMojo
             try
             {
                 Method getToolchainsMethod = toolchainManager.getClass().getMethod( "getToolchains",
-                        MavenSession.class, String.class, Map.class );
+                        Session.class, String.class, Map.class );
 
                 @SuppressWarnings( "unchecked" )
                 List<Toolchain> tcs = (List<Toolchain>) getToolchainsMethod.invoke( toolchainManager, getSession(),
@@ -100,18 +109,18 @@ public abstract class AbstractJLinkMojo
         if ( tc == null )
         {
             // TODO: Check if we should make the type configurable?
-            tc = toolchainManager.getToolchainFromBuildContext( "jdk", getSession() );
+            tc = toolchainManager.getToolchainFromBuildContext( getSession(), "jdk" );
         }
 
         return Optional.ofNullable( tc );
     }
 
-    protected MavenProject getProject()
+    protected Project getProject()
     {
         return project;
     }
 
-    protected MavenSession getSession()
+    protected Session getSession()
     {
         return session;
     }
