@@ -370,7 +370,8 @@ public class JLinkMojo
             throw new MojoException( "You have to use a classifier "
                     + "to attach supplemental artifacts to the project instead of replacing them." );
         }
-        projectManager.attachArtifact( getProject(), "jlink", getClassifier(), createZipArchiveFromImage );
+        projectManager.attachArtifact( getSession(), getProject(), "jlink",
+                                       getClassifier(), createZipArchiveFromImage );
     }
 
     private List<File> getCompileClasspathElements( Project project )
