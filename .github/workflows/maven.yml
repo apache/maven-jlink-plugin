@@ -44,11 +44,11 @@ jobs:
             maven-${{ matrix.os }}-
       - name: Install Toolchain JDK
         if: ${{ matrix.java == '8' }}
-        uses: AdoptOpenJDK/install-jdk@v1.1.1
+        uses: AdoptOpenJDK/install-jdk@v1
         with:
           version: '11'
           targets: 'TOOLCHAIN_JDK'
-          impl: 'openj9'
+          impl: 'hotspot'
       - name: Set up Toolchain
         if: ${{ matrix.java == '8' }}
         shell: bash
