@@ -158,12 +158,12 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
         {
             int exitCode = CommandLineUtils.executeCommandLine( cmd, out, err );
 
-            String output = ( StringUtils.isEmpty( out.getOutput() ) ? null : '\n' + out.getOutput().trim() );
+            String output = StringUtils.isEmpty( out.getOutput() ) ? null : '\n' + out.getOutput().trim();
 
             if ( exitCode != 0 )
             {
 
-                if ( StringUtils.isNotEmpty( output ) )
+                if ( output != null && !output.isEmpty() )
                 {
                     // Reconsider to use WARN / ERROR ?
                     //  getLog().error( output );
@@ -185,7 +185,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor
                 throw new MojoExecutionException( msg.toString() );
             }
 
-            if ( StringUtils.isNotEmpty( output ) )
+            if ( output != null && !output.isEmpty() )
             {
                 //getLog().info( output );
                 for ( String outputLine : output.split( "\n" ) )
