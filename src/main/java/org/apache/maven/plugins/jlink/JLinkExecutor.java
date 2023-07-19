@@ -1,3 +1,5 @@
+package org.apache.maven.plugins.jlink;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,14 +19,6 @@
  * under the License.
  */
 
-package org.apache.maven.plugins.jlink;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.toolchain.Toolchain;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -32,6 +26,10 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.toolchain.Toolchain;
 
 /**
  * JDK9+ executor for jlink.
@@ -59,7 +57,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
     @Override
     public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
     {
-        if (getToolchain().isPresent())
+        if ( getToolchain().isPresent() )
         {
             return super.executeJlink( jlinkArgs );
         }
@@ -128,7 +126,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor
     @Override
     public Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules )
     {
-        if ( getToolchain().isPresent())
+        if ( getToolchain().isPresent() )
         {
             return super.getJmodsFolder( sourceJdkModules );
         }
