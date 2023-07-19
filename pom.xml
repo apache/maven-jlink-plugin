@@ -67,8 +67,9 @@
   <properties>
     <!-- required due to conflict with asm:asm:3.3.1 in Maven 3.1.0, see MNG-5499. -->
     <mavenVersion>3.1.1</mavenVersion>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
+    <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
+    <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
     <project.build.outputTimestamp>2020-12-21T12:52:28Z</project.build.outputTimestamp>
   </properties>
 
@@ -185,28 +186,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.3.0</version>
-        <executions>
-          <execution>
-            <id>enforce-bytecode-version</id>
-            <configuration>
-              <rules>
-                <enforceBytecodeVersion>
-                  <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
-                  <excludes>
-                    <exclude>org.ow2.asm:asm</exclude>
-                  </excludes>
-                </enforceBytecodeVersion>
-                <requireSameVersions />
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
     <resources>
       <resource>
         <directory>src/main/filtered-resources</directory>
@@ -228,53 +207,6 @@
     </plugins>
   </reporting>
   <profiles>
-    <profile>
-      <id>jdk9</id>
-      <activation>
-        <jdk>[9,)</jdk>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>jdk9</id>
-                  <goals>
-                    <goal>compile</goal>
-                  </goals>
-                  <configuration>
-                    <release>9</release>
-                    <multiReleaseOutput>true</multiReleaseOutput>
-                    <compileSourceRoots>
-                      <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                    </compileSourceRoots>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-jar-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>default-jar</id>
-                  <configuration>
-                    <archive>
-                      <manifestEntries>
-                        <Multi-Release>true</Multi-Release>
-                      </manifestEntries>
-                    </archive>
-                  </configuration>
-                </execution>
-              </executions>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
     <profile>
       <id>run-its</id>
       <build>
