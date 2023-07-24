@@ -18,5 +18,5 @@
  */
 
 asfMavenTlpPlgnBuild([
-  'jdks': [11, 17, 20]
+  'jdks': ['11', '17', '20']
 ])
