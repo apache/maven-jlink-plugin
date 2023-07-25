@@ -19,19 +19,124 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.Optional;
+import java.util.spi.ToolProvider;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
 
 /**
- * JDK 8-only Jlink executor.
+ * JDK9+ executor for jlink.
  *
- * <p>As JDK8 does not ship jlink, a toolchain is required.</p>
+ * <p>This implementation uses the JDK9+ Toolprovider SPI to find and execute jlink.
+ * This way, no fork needs to be created.</p>
  */
 class JLinkExecutor extends AbstractJLinkToolchainExecutor
 {
+    private final ToolProvider toolProvider;
+
     JLinkExecutor( Toolchain toolchain, Log log )
     {
         super( toolchain, log );
+        this.toolProvider = getJLinkExecutable();
     }
 
+    protected final ToolProvider getJLinkExecutable()
+    {
+        return ToolProvider
+                .findFirst( "jlink" )
+                .orElseThrow( () -> new IllegalStateException( "No jlink tool found." ) );
+    }
+
+    @Override
+    public int executeJlink( List<String> jlinkArgs ) throws MojoExecutionException
+    {
+        if ( getToolchain().isPresent() )
+        {
+            return super.executeJlink( jlinkArgs );
+        }
+
+        if ( getLog().isDebugEnabled() )
+        {
+            // no quoted arguments ???
+            getLog().debug( this.toolProvider.name() + " " + jlinkArgs );
+        }
+
+        try ( StringWriter strErr = new StringWriter();
+              PrintWriter err = new PrintWriter( strErr );
+              StringWriter strOut = new StringWriter();
+              PrintWriter out = new PrintWriter( strOut ) )
+        {
+            int exitCode = this.toolProvider.run( out, err, jlinkArgs.toArray( new String[0] ) );
+            out.flush();
+            err.flush();
+
+            String outAsString = strOut.toString();
+            String output = ( StringUtils.isEmpty( outAsString ) ? null : '\n' + outAsString.trim() );
+
+            if ( exitCode != 0 )
+            {
+                if ( StringUtils.isNotEmpty( output ) )
+                {
+                    // Reconsider to use WARN / ERROR ?
+                    //  getLog().error( output );
+                    for ( String outputLine : output.split( "\n" ) )
+                    {
+                        getLog().error( outputLine );
+                    }
+                }
+
+                StringBuilder msg = new StringBuilder( "\nExit code: " );
+                msg.append( exitCode );
+                String errAsString = strErr.toString();
+                if ( StringUtils.isNotEmpty( errAsString ) )
+                {
+                    msg.append( " - " ).append( errAsString );
+                }
+                msg.append( '\n' );
+                msg.append( "Command line was: " ).append( this.toolProvider.name() ).append( ' ' ).append(
+                        jlinkArgs ).append( '\n' ).append( '\n' );
+
+                throw new MojoExecutionException( msg.toString() );
+            }
+
+            if ( StringUtils.isNotEmpty( output ) )
+            {
+                //getLog().info( output );
+                for ( String outputLine : output.split( "\n" ) )
+                {
+                    getLog().info( outputLine );
+                }
+            }
+
+            return exitCode;
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Unable to execute jlink command: " + e.getMessage(), e );
+        }
+    }
+
+    @Override
+    public Optional<File> getJmodsFolder( /* nullable */ File sourceJdkModules )
+    {
+        if ( getToolchain().isPresent() )
+        {
+            return super.getJmodsFolder( sourceJdkModules );
+        }
+
+        if ( sourceJdkModules != null && sourceJdkModules.isDirectory() )
+        {
+            return Optional.of( new File( sourceJdkModules, JMODS ) );
+        }
+
+        // ToolProvider does not need jmods folder to be set.
+        return Optional.empty();
+    }
 }
