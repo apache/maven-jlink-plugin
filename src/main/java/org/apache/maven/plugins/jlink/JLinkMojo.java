@@ -1,3 +1,21 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package org.apache.maven.plugins.jlink;
 
 /*
@@ -60,13 +78,11 @@ import static java.util.Collections.singletonMap;
  * The JLink goal is intended to create a Java Run Time Image file based on
  * <a href="https://openjdk.java.net/jeps/282">https://openjdk.java.net/jeps/282</a>,
  * <a href="https://openjdk.java.net/jeps/220">https://openjdk.java.net/jeps/220</a>.
- * 
+ *
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
-@Mojo( name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE )
-public class JLinkMojo
-    extends AbstractJLinkMojo
-{
+@Mojo(name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE)
+public class JLinkMojo extends AbstractJLinkMojo {
     @Component
     private LocationManager locationManager;
 
@@ -84,7 +100,7 @@ public class JLinkMojo
      * This is intended to strip debug information out. The command line equivalent of <code>jlink</code> is:
      * <code>-G, --strip-debug</code> strip debug information.
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean stripDebug;
 
     /**
@@ -126,7 +142,7 @@ public class JLinkMojo
     /**
      * Limit the universe of observable modules. The following gives an example of the configuration which can be used
      * in the <code>pom.xml</code> file.
-     * 
+     *
      * <pre>
      *   &lt;limitModules&gt;
      *     &lt;limitModule&gt;mod1&lt;/limitModule&gt;
@@ -135,7 +151,7 @@ public class JLinkMojo
      *     .
      *   &lt;/limitModules&gt;
      * </pre>
-     * 
+     *
      * This configuration is the equivalent of the command line option:
      * <code>--limit-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>
      */
@@ -150,7 +166,7 @@ public class JLinkMojo
      * By using the --add-modules you can define the root modules to be resolved. The configuration in
      * <code>pom.xml</code> file can look like this:
      * </p>
-     * 
+     *
      * <pre>
      * &lt;addModules&gt;
      *   &lt;addModule&gt;mod1&lt;/addModule&gt;
@@ -159,7 +175,7 @@ public class JLinkMojo
      *   .
      * &lt;/addModules&gt;
      * </pre>
-     * 
+     *
      * The command line equivalent for jlink is: <code>--add-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>.
      */
     @Parameter
@@ -180,13 +196,13 @@ public class JLinkMojo
      * otherwise {@code default} will be used as subdirectory.
      * This ensures that multiple executions using classifiers will not overwrite the previous run’s image.</p>
      */
-    @Parameter( defaultValue = "${project.build.directory}/maven-jlink", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.build.directory}/maven-jlink", required = true, readonly = true)
     private File outputDirectoryImage;
 
-    @Parameter( defaultValue = "${project.build.directory}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.build.directory}", required = true, readonly = true)
     private File buildDirectory;
 
-    @Parameter( defaultValue = "${project.build.outputDirectory}", required = true, readonly = true )
+    @Parameter(defaultValue = "${project.build.outputDirectory}", required = true, readonly = true)
     private File outputDirectory;
 
     /**
@@ -207,7 +223,7 @@ public class JLinkMojo
     /**
      * Add the option <code>--bind-services</code> or not.
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean bindServices;
 
     /**
@@ -219,26 +235,26 @@ public class JLinkMojo
     /**
      * <code>--ignore-signing-information</code>
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean ignoreSigningInformation;
 
     /**
      * This will suppress to have an <code>includes</code> directory in the resulting Java Run Time Image. The JLink
      * command line equivalent is: <code>--no-header-files</code>
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean noHeaderFiles;
 
     /**
      * This will suppress to have the <code>man</code> directory in the resulting Java Run Time Image. The JLink command
      * line equivalent is: <code>--no-man-pages</code>
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean noManPages;
 
     /**
      * Suggest providers that implement the given service types from the module path.
-     * 
+     *
      * <pre>
      * &lt;suggestProviders&gt;
      *   &lt;suggestProvider&gt;name-a&lt;/suggestProvider&gt;
@@ -247,7 +263,7 @@ public class JLinkMojo
      *   .
      * &lt;/suggestProviders&gt;
      * </pre>
-     * 
+     *
      * The jlink command linke equivalent: <code>--suggest-providers [&lt;name&gt;,...]</code>
      */
     @Parameter
@@ -277,13 +293,13 @@ public class JLinkMojo
     /**
      * This will turn on verbose mode. The jlink command line equivalent is: <code>--verbose</code>
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter(defaultValue = "false")
     private boolean verbose;
 
     /**
      * The JAR archiver needed for archiving the environments.
      */
-    @Component( role = Archiver.class, hint = "zip" )
+    @Component(role = Archiver.class, hint = "zip")
     private ZipArchiver zipArchiver;
 
     /**
@@ -305,7 +321,7 @@ public class JLinkMojo
      * Name of the generated ZIP file in the <code>target</code> directory. This will not change the name of the
      * installed/deployed file.
      */
-    @Parameter( defaultValue = "${project.build.finalName}", readonly = true )
+    @Parameter(defaultValue = "${project.build.finalName}", readonly = true)
     private String finalName;
 
     /**
@@ -315,8 +331,7 @@ public class JLinkMojo
     private MavenProjectHelper projectHelper;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         failIfParametersAreNotInTheirValidValueRanges();
 
         setOutputDirectoryImage();
@@ -325,168 +340,141 @@ public class JLinkMojo
 
         JLinkExecutor jLinkExec = getExecutor();
         Collection<String> modulesToAdd = new ArrayList<>();
-        if ( addModules != null )
-        {
-            modulesToAdd.addAll( addModules );
+        if (addModules != null) {
+            modulesToAdd.addAll(addModules);
         }
-        jLinkExec.addAllModules( modulesToAdd );
+        jLinkExec.addAllModules(modulesToAdd);
 
         Collection<String> pathsOfModules = new ArrayList<>();
-        if ( modulePaths != null )
-        {
-            pathsOfModules.addAll( modulePaths );
+        if (modulePaths != null) {
+            pathsOfModules.addAll(modulePaths);
         }
 
-        for ( Entry<String, File> item : getModulePathElements().entrySet() )
-        {
-            getLog().info( " -> module: " + item.getKey() + " ( " + item.getValue().getPath() + " )" );
+        for (Entry<String, File> item : getModulePathElements().entrySet()) {
+            getLog().info(" -> module: " + item.getKey() + " ( "
+                    + item.getValue().getPath() + " )");
 
             // We use the real module name and not the artifact Id...
-            modulesToAdd.add( item.getKey() );
-            pathsOfModules.add( item.getValue().getPath() );
+            modulesToAdd.add(item.getKey());
+            pathsOfModules.add(item.getValue().getPath());
         }
 
         // The jmods directory of the JDK
-        jLinkExec.getJmodsFolder( this.sourceJdkModules ).ifPresent(
-                jmodsFolder -> pathsOfModules.add( jmodsFolder.getAbsolutePath() )
-        );
-        jLinkExec.addAllModulePaths( pathsOfModules );
+        jLinkExec
+                .getJmodsFolder(this.sourceJdkModules)
+                .ifPresent(jmodsFolder -> pathsOfModules.add(jmodsFolder.getAbsolutePath()));
+        jLinkExec.addAllModulePaths(pathsOfModules);
 
-        List<String> jlinkArgs = createJlinkArgs( pathsOfModules, modulesToAdd );
+        List<String> jlinkArgs = createJlinkArgs(pathsOfModules, modulesToAdd);
 
-        try
-        {
-            jLinkExec.executeJlink( jlinkArgs );
-        }
-        catch ( IllegalStateException e )
-        {
-            throw new MojoFailureException( "Unable to find jlink command: " + e.getMessage(), e );
+        try {
+            jLinkExec.executeJlink(jlinkArgs);
+        } catch (IllegalStateException e) {
+            throw new MojoFailureException("Unable to find jlink command: " + e.getMessage(), e);
         }
 
-        File createZipArchiveFromImage = createZipArchiveFromImage( buildDirectory, outputDirectoryImage );
+        File createZipArchiveFromImage = createZipArchiveFromImage(buildDirectory, outputDirectoryImage);
 
-        if ( hasClassifier() )
-        {
-            projectHelper.attachArtifact( getProject(), "jlink", getClassifier(), createZipArchiveFromImage );
-        }
-        else
-        {
-            if ( projectHasAlreadySetAnArtifact() )
-            {
-                throw new MojoExecutionException( "You have to use a classifier "
-                        + "to attach supplemental artifacts to the project instead of replacing them." );
+        if (hasClassifier()) {
+            projectHelper.attachArtifact(getProject(), "jlink", getClassifier(), createZipArchiveFromImage);
+        } else {
+            if (projectHasAlreadySetAnArtifact()) {
+                throw new MojoExecutionException("You have to use a classifier "
+                        + "to attach supplemental artifacts to the project instead of replacing them.");
             }
-            getProject().getArtifact().setFile( createZipArchiveFromImage );
+            getProject().getArtifact().setFile(createZipArchiveFromImage);
         }
     }
 
-    private List<File> getCompileClasspathElements( MavenProject project )
-    {
-        List<File> list = new ArrayList<>( project.getArtifacts().size() + 1 );
+    private List<File> getCompileClasspathElements(MavenProject project) {
+        List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
 
-        for ( Artifact a : project.getArtifacts() )
-        {
-            getLog().debug( "Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion() );
-            list.add( a.getFile() );
+        for (Artifact a : project.getArtifacts()) {
+            getLog().debug("Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion());
+            list.add(a.getFile());
         }
         return list;
     }
 
-    private Map<String, File> getModulePathElements()
-        throws MojoFailureException
-    {
+    private Map<String, File> getModulePathElements() throws MojoFailureException {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
         // and we can detect if auto modules are used. In that case, MavenProject.setFile() should not be used, so
         // you cannot depend on this project and so it won't be distributed.
 
         Map<String, File> modulepathElements = new HashMap<>();
 
-        try
-        {
-            Collection<File> dependencyArtifacts = getCompileClasspathElements( getProject() );
+        try {
+            Collection<File> dependencyArtifacts = getCompileClasspathElements(getProject());
 
-            ResolvePathsRequest<File> request = ResolvePathsRequest.ofFiles( dependencyArtifacts );
+            ResolvePathsRequest<File> request = ResolvePathsRequest.ofFiles(dependencyArtifacts);
 
             Optional<Toolchain> toolchain = getToolchain();
-            if ( toolchain.isPresent()
-                    && toolchain.orElseThrow( NoSuchElementException::new ) instanceof DefaultJavaToolChain )
-            {
-                Toolchain toolcahin1 = toolchain.orElseThrow( NoSuchElementException::new );
-                request.setJdkHome( new File( ( (DefaultJavaToolChain) toolcahin1 ).getJavaHome() ) );
+            if (toolchain.isPresent()
+                    && toolchain.orElseThrow(NoSuchElementException::new) instanceof DefaultJavaToolChain) {
+                Toolchain toolcahin1 = toolchain.orElseThrow(NoSuchElementException::new);
+                request.setJdkHome(new File(((DefaultJavaToolChain) toolcahin1).getJavaHome()));
             }
 
-            ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths( request );
+            ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths(request);
 
-            for ( Map.Entry<File, JavaModuleDescriptor> entry : resolvePathsResult.getPathElements().entrySet() )
-            {
+            for (Map.Entry<File, JavaModuleDescriptor> entry :
+                    resolvePathsResult.getPathElements().entrySet()) {
                 JavaModuleDescriptor descriptor = entry.getValue();
-                if ( descriptor == null )
-                {
+                if (descriptor == null) {
                     String message = "The given dependency " + entry.getKey()
-                        + " does not have a module-info.java file. So it can't be linked.";
-                    getLog().error( message );
-                    throw new MojoFailureException( message );
+                            + " does not have a module-info.java file. So it can't be linked.";
+                    getLog().error(message);
+                    throw new MojoFailureException(message);
                 }
 
                 // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug( " module: " + descriptor.name() + " automatic: " + descriptor.isAutomatic() );
-                if ( modulepathElements.containsKey( descriptor.name() ) )
-                {
-                    getLog().warn( "The module name " + descriptor.name() + " does already exists." );
+                getLog().debug(" module: " + descriptor.name() + " automatic: " + descriptor.isAutomatic());
+                if (modulepathElements.containsKey(descriptor.name())) {
+                    getLog().warn("The module name " + descriptor.name() + " does already exists.");
                 }
-                modulepathElements.put( descriptor.name(), entry.getKey() );
+                modulepathElements.put(descriptor.name(), entry.getKey());
             }
 
             // This part is for the module in target/classes ? (Hacky..)
             // FIXME: Is there a better way to identify that code exists?
-            if ( outputDirectory.exists() )
-            {
-                List<File> singletonList = Collections.singletonList( outputDirectory );
+            if (outputDirectory.exists()) {
+                List<File> singletonList = Collections.singletonList(outputDirectory);
 
-                ResolvePathsRequest<File> singleModuls = ResolvePathsRequest.ofFiles( singletonList );
+                ResolvePathsRequest<File> singleModuls = ResolvePathsRequest.ofFiles(singletonList);
 
-                ResolvePathsResult<File> resolvePaths = locationManager.resolvePaths( singleModuls );
-                for ( Entry<File, JavaModuleDescriptor> entry : resolvePaths.getPathElements().entrySet() )
-                {
+                ResolvePathsResult<File> resolvePaths = locationManager.resolvePaths(singleModuls);
+                for (Entry<File, JavaModuleDescriptor> entry :
+                        resolvePaths.getPathElements().entrySet()) {
                     JavaModuleDescriptor descriptor = entry.getValue();
-                    if ( descriptor == null )
-                    {
+                    if (descriptor == null) {
                         String message = "The given project " + entry.getKey()
-                            + " does not contain a module-info.java file. So it can't be linked.";
-                        getLog().error( message );
-                        throw new MojoFailureException( message );
+                                + " does not contain a module-info.java file. So it can't be linked.";
+                        getLog().error(message);
+                        throw new MojoFailureException(message);
                     }
-                    if ( modulepathElements.containsKey( descriptor.name() ) )
-                    {
-                        getLog().warn( "The module name " + descriptor.name() + " does already exists." );
+                    if (modulepathElements.containsKey(descriptor.name())) {
+                        getLog().warn("The module name " + descriptor.name() + " does already exists.");
                     }
-                    modulepathElements.put( descriptor.name(), entry.getKey() );
+                    modulepathElements.put(descriptor.name(), entry.getKey());
                 }
             }
 
-        }
-        catch ( IOException e )
-        {
-            getLog().error( e.getMessage() );
-            throw new MojoFailureException( e.getMessage() );
+        } catch (IOException e) {
+            getLog().error(e.getMessage());
+            throw new MojoFailureException(e.getMessage());
         }
 
         return modulepathElements;
     }
 
-    private JLinkExecutor getExecutor()
-    {
+    private JLinkExecutor getExecutor() {
         return getJlinkExecutor();
     }
 
-    private boolean projectHasAlreadySetAnArtifact( )
-    {
-        if ( getProject().getArtifact().getFile() != null )
-        {
+    private boolean projectHasAlreadySetAnArtifact() {
+        if (getProject().getArtifact().getFile() != null) {
             return getProject().getArtifact().getFile().isFile();
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
@@ -494,86 +482,68 @@ public class JLinkMojo
     /**
      * @return true in case where the classifier is not {@code null} and contains something else than white spaces.
      */
-    protected boolean hasClassifier()
-    {
+    protected boolean hasClassifier() {
         boolean result = false;
-        if ( getClassifier() != null && !getClassifier().isEmpty() )
-        {
+        if (getClassifier() != null && !getClassifier().isEmpty()) {
             result = true;
         }
 
         return result;
     }
 
-    private File createZipArchiveFromImage( File outputDirectory, File outputDirectoryImage )
-        throws MojoExecutionException
-    {
-        zipArchiver.addDirectory( outputDirectoryImage );
+    private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
+            throws MojoExecutionException {
+        zipArchiver.addDirectory(outputDirectoryImage);
 
-        File resultArchive = getArchiveFile( outputDirectory, finalName, getClassifier(), "zip" );
+        File resultArchive = getArchiveFile(outputDirectory, finalName, getClassifier(), "zip");
 
-        zipArchiver.setDestFile( resultArchive );
-        try
-        {
+        zipArchiver.setDestFile(resultArchive);
+        try {
             zipArchiver.createArchive();
-        }
-        catch ( ArchiverException | IOException e )
-        {
-            getLog().error( e.getMessage(), e );
-            throw new MojoExecutionException( e.getMessage(), e );
+        } catch (ArchiverException | IOException e) {
+            getLog().error(e.getMessage(), e);
+            throw new MojoExecutionException(e.getMessage(), e);
         }
 
         return resultArchive;
-
     }
 
-    private void failIfParametersAreNotInTheirValidValueRanges()
-        throws MojoFailureException
-    {
-        if ( compress != null && ( compress < 0 || compress > 2 ) )
-        {
+    private void failIfParametersAreNotInTheirValidValueRanges() throws MojoFailureException {
+        if (compress != null && (compress < 0 || compress > 2)) {
             String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
-            getLog().error( message );
-            throw new MojoFailureException( message );
+            getLog().error(message);
+            throw new MojoFailureException(message);
         }
 
-        if ( endian != null && ( !"big".equals( endian ) && !"little".equals( endian ) ) )
-        {
+        if (endian != null && (!"big".equals(endian) && !"little".equals(endian))) {
             String message = "The given endian parameter " + endian
                     + " does not contain one of the following values: 'little' or 'big'.";
-            getLog().error( message );
-            throw new MojoFailureException( message );
+            getLog().error(message);
+            throw new MojoFailureException(message);
         }
 
-        if ( addOptions != null && !addOptions.isEmpty() )
-        {
+        if (addOptions != null && !addOptions.isEmpty()) {
             requireJdk14();
         }
     }
 
-    private void requireJdk14() throws MojoFailureException
-    {
+    private void requireJdk14() throws MojoFailureException {
         // needs JDK 14+
         Optional<Toolchain> optToolchain = getToolchain();
         String java14reqMsg = "parameter 'addOptions' needs at least a Java 14 runtime or a Java 14 toolchain.";
 
-        if ( optToolchain.isPresent() )
-        {
-            Toolchain toolchain = optToolchain.orElseThrow( NoSuchElementException::new );
-            if ( !( toolchain instanceof ToolchainPrivate ) )
-            {
-                getLog().warn( "Unable to check toolchain java version." );
+        if (optToolchain.isPresent()) {
+            Toolchain toolchain = optToolchain.orElseThrow(NoSuchElementException::new);
+            if (!(toolchain instanceof ToolchainPrivate)) {
+                getLog().warn("Unable to check toolchain java version.");
                 return;
             }
             ToolchainPrivate toolchainPrivate = (ToolchainPrivate) toolchain;
-            if ( !toolchainPrivate.matchesRequirements( singletonMap( "jdk", "14" ) ) )
-            {
-                throw new MojoFailureException( java14reqMsg );
+            if (!toolchainPrivate.matchesRequirements(singletonMap("jdk", "14"))) {
+                throw new MojoFailureException(java14reqMsg);
             }
-        }
-        else if ( !JavaVersion.JAVA_VERSION.isAtLeast( "14" ) )
-        {
-            throw new MojoFailureException( java14reqMsg );
+        } else if (!JavaVersion.JAVA_VERSION.isAtLeast("14")) {
+            throw new MojoFailureException(java14reqMsg);
         }
     }
 
@@ -583,178 +553,142 @@ public class JLinkMojo
      * <p>Rationale: If a user creates multiple jlink artifacts using classifiers,
      * the directories should not overwrite themselves for each execution.</p>
      */
-    private void setOutputDirectoryImage()
-    {
-        if ( hasClassifier() )
-        {
-            final File classifiersDirectory = new File( outputDirectoryImage, "classifiers" );
-            outputDirectoryImage = new File( classifiersDirectory, classifier );
-        }
-        else
-        {
-            outputDirectoryImage = new File( outputDirectoryImage, "default" );
+    private void setOutputDirectoryImage() {
+        if (hasClassifier()) {
+            final File classifiersDirectory = new File(outputDirectoryImage, "classifiers");
+            outputDirectoryImage = new File(classifiersDirectory, classifier);
+        } else {
+            outputDirectoryImage = new File(outputDirectoryImage, "default");
         }
     }
 
-    private void ifOutputDirectoryExistsDelteIt()
-        throws MojoExecutionException
-    {
-        if ( outputDirectoryImage.exists() )
-        {
+    private void ifOutputDirectoryExistsDelteIt() throws MojoExecutionException {
+        if (outputDirectoryImage.exists()) {
             // Delete the output folder of JLink before we start
             // otherwise JLink will fail with a message "Error: directory already exists: ..."
-            try
-            {
-                getLog().debug( "Deleting existing " + outputDirectoryImage.getAbsolutePath() );
-                FileUtils.forceDelete( outputDirectoryImage );
-            }
-            catch ( IOException e )
-            {
-                getLog().error( "IOException", e );
-                throw new MojoExecutionException( "Failure during deletion of " + outputDirectoryImage.getAbsolutePath()
-                    + " occured." );
+            try {
+                getLog().debug("Deleting existing " + outputDirectoryImage.getAbsolutePath());
+                FileUtils.forceDelete(outputDirectoryImage);
+            } catch (IOException e) {
+                getLog().error("IOException", e);
+                throw new MojoExecutionException(
+                        "Failure during deletion of " + outputDirectoryImage.getAbsolutePath() + " occured.");
             }
         }
     }
 
-    private List<String> createJlinkArgs( Collection<String> pathsOfModules,
-                                      Collection<String> modulesToAdd )
-    {
+    private List<String> createJlinkArgs(Collection<String> pathsOfModules, Collection<String> modulesToAdd) {
         List<String> jlinkArgs = new ArrayList<>();
 
-        if ( stripDebug )
-        {
-            jlinkArgs.add( "--strip-debug" );
+        if (stripDebug) {
+            jlinkArgs.add("--strip-debug");
         }
 
-        if ( bindServices )
-        {
-            jlinkArgs.add( "--bind-services" );
+        if (bindServices) {
+            jlinkArgs.add("--bind-services");
         }
 
-        if ( endian != null )
-        {
-            jlinkArgs.add( "--endian" );
-            jlinkArgs.add( endian );
+        if (endian != null) {
+            jlinkArgs.add("--endian");
+            jlinkArgs.add(endian);
         }
-        if ( ignoreSigningInformation )
-        {
-            jlinkArgs.add( "--ignore-signing-information" );
+        if (ignoreSigningInformation) {
+            jlinkArgs.add("--ignore-signing-information");
         }
-        if ( compress != null )
-        {
-            jlinkArgs.add( "--compress" );
-            jlinkArgs.add( compress + "" );
+        if (compress != null) {
+            jlinkArgs.add("--compress");
+            jlinkArgs.add(compress + "");
         }
-        if ( launcher != null )
-        {
-            jlinkArgs.add( "--launcher" );
-            jlinkArgs.add( launcher );
+        if (launcher != null) {
+            jlinkArgs.add("--launcher");
+            jlinkArgs.add(launcher);
         }
-        if ( addOptions != null && !addOptions.isEmpty() )
-        {
-            jlinkArgs.add( "--add-options" );
-            jlinkArgs.add( String.format( "\"%s\"", String.join( " ", addOptions ) ) );
+        if (addOptions != null && !addOptions.isEmpty()) {
+            jlinkArgs.add("--add-options");
+            jlinkArgs.add(String.format("\"%s\"", String.join(" ", addOptions)));
         }
 
-        if ( disablePlugin != null )
-        {
-            jlinkArgs.add( "--disable-plugin" );
-            jlinkArgs.add( disablePlugin );
-
+        if (disablePlugin != null) {
+            jlinkArgs.add("--disable-plugin");
+            jlinkArgs.add(disablePlugin);
         }
-        if ( pathsOfModules != null )
-        {
+        if (pathsOfModules != null) {
             // @formatter:off
-            jlinkArgs.add( "--module-path" );
-            jlinkArgs.add( getPlatformDependSeparateList( pathsOfModules ).replace( "\\", "\\\\" ) );
+            jlinkArgs.add("--module-path");
+            jlinkArgs.add(getPlatformDependSeparateList(pathsOfModules).replace("\\", "\\\\"));
             // @formatter:off
         }
 
-        if ( noHeaderFiles )
-        {
-            jlinkArgs.add( "--no-header-files" );
+        if (noHeaderFiles) {
+            jlinkArgs.add("--no-header-files");
         }
 
-        if ( noManPages )
-        {
-            jlinkArgs.add( "--no-man-pages" );
+        if (noManPages) {
+            jlinkArgs.add("--no-man-pages");
         }
 
-        if ( hasSuggestProviders() )
-        {
-            jlinkArgs.add( "--suggest-providers" );
-            String sb = getCommaSeparatedList( suggestProviders );
-            jlinkArgs.add( sb );
+        if (hasSuggestProviders()) {
+            jlinkArgs.add("--suggest-providers");
+            String sb = getCommaSeparatedList(suggestProviders);
+            jlinkArgs.add(sb);
         }
 
-        if ( hasLimitModules() )
-        {
-            jlinkArgs.add( "--limit-modules" );
-            String sb = getCommaSeparatedList( limitModules );
-            jlinkArgs.add( sb );
+        if (hasLimitModules()) {
+            jlinkArgs.add("--limit-modules");
+            String sb = getCommaSeparatedList(limitModules);
+            jlinkArgs.add(sb);
         }
 
-        if ( !modulesToAdd.isEmpty() )
-        {
-            jlinkArgs.add( "--add-modules" );
+        if (!modulesToAdd.isEmpty()) {
+            jlinkArgs.add("--add-modules");
             // This must be name of the module and *NOT* the name of the
             // file! Can we somehow pre check this information to fail early?
-            String sb = getCommaSeparatedList( modulesToAdd );
-            jlinkArgs.add( sb.replace( "\\", "\\\\" ) );
+            String sb = getCommaSeparatedList(modulesToAdd);
+            jlinkArgs.add(sb.replace("\\", "\\\\"));
         }
 
-        if ( hasIncludeLocales() )
-        {
-            jlinkArgs.add( "--add-modules" );
-            jlinkArgs.add( "jdk.localedata" );
-            jlinkArgs.add( "--include-locales" );
-            String sb = getCommaSeparatedList( includeLocales );
-            jlinkArgs.add( sb );
+        if (hasIncludeLocales()) {
+            jlinkArgs.add("--add-modules");
+            jlinkArgs.add("jdk.localedata");
+            jlinkArgs.add("--include-locales");
+            String sb = getCommaSeparatedList(includeLocales);
+            jlinkArgs.add(sb);
         }
 
-        if ( pluginModulePath != null )
-        {
-            jlinkArgs.add( "--plugin-module-path" );
-            StringBuilder sb = convertSeparatedModulePathToPlatformSeparatedModulePath( pluginModulePath );
-            jlinkArgs.add( sb.toString().replace( "\\", "\\\\" ) );
+        if (pluginModulePath != null) {
+            jlinkArgs.add("--plugin-module-path");
+            StringBuilder sb = convertSeparatedModulePathToPlatformSeparatedModulePath(pluginModulePath);
+            jlinkArgs.add(sb.toString().replace("\\", "\\\\"));
         }
 
-        if ( buildDirectory != null )
-        {
-            jlinkArgs.add( "--output" );
-            jlinkArgs.add( outputDirectoryImage.getAbsolutePath() );
+        if (buildDirectory != null) {
+            jlinkArgs.add("--output");
+            jlinkArgs.add(outputDirectoryImage.getAbsolutePath());
         }
 
-        if ( verbose )
-        {
-            jlinkArgs.add( "--verbose" );
+        if (verbose) {
+            jlinkArgs.add("--verbose");
         }
 
-        return Collections.unmodifiableList( jlinkArgs );
+        return Collections.unmodifiableList(jlinkArgs);
     }
 
-    private boolean hasIncludeLocales()
-    {
+    private boolean hasIncludeLocales() {
         return includeLocales != null && !includeLocales.isEmpty();
     }
 
-    private boolean hasSuggestProviders()
-    {
+    private boolean hasSuggestProviders() {
         return suggestProviders != null && !suggestProviders.isEmpty();
     }
 
-    private boolean hasLimitModules()
-    {
+    private boolean hasLimitModules() {
         return limitModules != null && !limitModules.isEmpty();
     }
 
     /**
      * {@inheritDoc}
      */
-    protected String getClassifier()
-    {
+    protected String getClassifier() {
         return classifier;
     }
-
 }

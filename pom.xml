@@ -1,5 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one
   or more contributor license agreements. See the NOTICE file
@@ -18,14 +17,13 @@
   specific language governing permissions and limitations
   under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.apache.maven.plugins</groupId>
     <artifactId>maven-plugins</artifactId>
-    <version>34</version>
+    <version>39</version>
     <relativePath />
   </parent>
 
@@ -45,8 +43,8 @@
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</developerConnection>
-    <url>https://github.com/apache/maven-jlink-plugin/tree/${project.scm.tag}</url>
     <tag>HEAD</tag>
+    <url>https://github.com/apache/maven-jlink-plugin/tree/${project.scm.tag}</url>
   </scm>
 
   <issueManagement>
@@ -65,13 +63,30 @@
   </distributionManagement>
 
   <properties>
-    <!-- required due to conflict with asm:asm:3.3.1 in Maven 3.1.0, see MNG-5499. -->
-    <mavenVersion>3.1.1</mavenVersion>
+    <mavenVersion>3.6.3</mavenVersion>
     <maven.compiler.release>11</maven.compiler.release>
     <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
     <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
     <project.build.outputTimestamp>2020-12-21T12:52:28Z</project.build.outputTimestamp>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.5.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>5.9.2</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -93,9 +108,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-archiver</artifactId>
-      <version>3.5.1</version>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-shared-utils</artifactId>
+      <version>3.4.2</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -136,25 +151,13 @@
     </dependency>
   </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>3.5.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>5.9.2</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <build>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/filtered-resources</directory>
+      </resource>
+    </resources>
     <pluginManagement>
       <plugins>
         <!-- remove with next parent upgrade -->
@@ -186,12 +189,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    <resources>
-      <resource>
-        <directory>src/main/filtered-resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
   </build>
 
   <reporting>
@@ -215,14 +212,6 @@
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>mrm-maven-plugin</artifactId>
             <version>1.5.0</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>start</goal>
-                  <goal>stop</goal>
-                </goals>
-              </execution>
-            </executions>
             <configuration>
               <propertyName>mrm.repository.url</propertyName>
               <repositories>
@@ -232,11 +221,19 @@
                 <proxyRepo />
               </repositories>
             </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>start</goal>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-			<version>3.5.1</version>
+            <version>3.5.1</version>
             <configuration>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <environmentVariables>
@@ -264,7 +261,7 @@
               <filterProperties>
                 <mrm.repository.url>${mrm.repository.url}</mrm.repository.url>
               </filterProperties>
-			  <streamLogsOnFailures>true</streamLogsOnFailures>
+              <streamLogsOnFailures>true</streamLogsOnFailures>
               <goals>
                 <goal>clean</goal>
                 <goal>package</goal>
