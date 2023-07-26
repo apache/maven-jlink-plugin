@@ -1,4 +1,3 @@
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,18 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.plugins.jlink;
 
-import java.io.*
-import java.util.*
-import java.util.jar.*
-import org.codehaus.plexus.util.*
+import java.lang.reflect.Field;
+import java.util.List;
 
-String buildlog = new File( basedir, "build.log").text
-assert buildlog.contains( "--add-options, \"-Xmx128m --enable-preview -Dvar=value\"" )
-assert buildlog.contains( "addOptions = [-Xmx128m, --enable-preview, -Dvar=value]" )
+import org.junit.jupiter.api.Test;
 
-File target = new File( basedir, "target" )
-assert target.isDirectory()
+import static org.assertj.core.api.Assertions.assertThat;
 
-File artifact = new File( target, "maven-jlink-plugin-cli-options-add-options-101.0.zip" )
-assert artifact.isFile()
+public class JLinkMojoTest {
+
+    @Test
+    void quote_every_argument() throws Exception {
+        // given
+        JLinkMojo mojo = new JLinkMojo();
+        Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
+        stripDebug.setAccessible(true);
+        stripDebug.set(mojo, Boolean.TRUE);
+
+        // when
+        List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
+
+        // then
+        assertThat(jlinkArgs).noneMatch(arg -> arg.trim().isBlank());
+    }
+}

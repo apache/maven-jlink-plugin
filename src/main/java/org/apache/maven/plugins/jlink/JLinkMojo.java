@@ -577,7 +577,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
     }
 
-    private List<String> createJlinkArgs(Collection<String> pathsOfModules, Collection<String> modulesToAdd) {
+    protected List<String> createJlinkArgs(Collection<String> pathsOfModules, Collection<String> modulesToAdd) {
         List<String> jlinkArgs = new ArrayList<>();
 
         if (stripDebug) {
@@ -612,7 +612,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add("--disable-plugin");
             jlinkArgs.add(disablePlugin);
         }
-        if (pathsOfModules != null) {
+        if (pathsOfModules != null && !pathsOfModules.isEmpty()) {
             // @formatter:off
             jlinkArgs.add("--module-path");
             jlinkArgs.add(getPlatformDependSeparateList(pathsOfModules).replace("\\", "\\\\"));

@@ -102,7 +102,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
 
     private Commandline createJLinkCommandLine(List<String> jlinkArgs) {
         Commandline cmd = new Commandline();
-        jlinkArgs.forEach(arg -> cmd.createArg().setValue(arg));
+        jlinkArgs.forEach(arg -> cmd.createArg().setValue("\"" + arg + "\""));
 
         return cmd;
     }
