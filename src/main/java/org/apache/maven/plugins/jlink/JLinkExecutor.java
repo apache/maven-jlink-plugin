@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.spi.ToolProvider;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.toolchain.Toolchain;
@@ -88,10 +87,10 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor {
             err.flush();
 
             String outAsString = strOut.toString();
-            String output = (StringUtils.isEmpty(outAsString) ? null : '\n' + outAsString.trim());
+            String output = outAsString.isBlank() ? null : '\n' + outAsString.trim();
 
             if (exitCode != 0) {
-                if (StringUtils.isNotEmpty(output)) {
+                if (output != null && !output.isBlank()) {
                     // Reconsider to use WARN / ERROR ?
                     //  getLog().error( output );
                     for (String outputLine : output.split("\n")) {
@@ -102,7 +101,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor {
                 StringBuilder msg = new StringBuilder("\nExit code: ");
                 msg.append(exitCode);
                 String errAsString = strErr.toString();
-                if (StringUtils.isNotEmpty(errAsString)) {
+                if (errAsString != null && !errAsString.isBlank()) {
                     msg.append(" - ").append(errAsString);
                 }
                 msg.append('\n');
@@ -116,7 +115,7 @@ class JLinkExecutor extends AbstractJLinkToolchainExecutor {
                 throw new MojoExecutionException(msg.toString());
             }
 
-            if (StringUtils.isNotEmpty(output)) {
+            if (output != null && !output.isBlank()) {
                 // getLog().info( output );
                 for (String outputLine : output.split("\n")) {
                     getLog().info(outputLine);
