@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
@@ -71,6 +72,7 @@ import org.codehaus.plexus.languages.java.jpms.LocationManager;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsRequest;
 import org.codehaus.plexus.languages.java.jpms.ResolvePathsResult;
 import org.codehaus.plexus.languages.java.version.JavaVersion;
+import org.eclipse.sisu.Nullable;
 
 import static java.util.Collections.singletonMap;
 
@@ -83,6 +85,13 @@ import static java.util.Collections.singletonMap;
  */
 @Mojo(name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE)
 public class JLinkMojo extends AbstractJLinkMojo {
+
+    /**
+     * Valid compression level input. Unless a single digit (for legacy compatibility with
+     * Java releases before 21), must match "zip-n", where n is a single digit number.
+     */
+    private static final Pattern COMPRESSION_STRING = Pattern.compile("^zip-[0-9]$");
+
     @Component
     private LocationManager locationManager;
 
@@ -105,14 +114,32 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     /**
      * Here you can define the compression of the resources being used. The command line equivalent is:
-     * <code>-c, --compress=level&gt;</code>. The valid values for the level are: <code>0, 1, 2</code>.
+     * <code>-c, --compress=&lt;level&gt;</code>.
+     *
+     * <p>The valid values for the level depend on the JDK:</p>
+     *
+     * <p>For JDK 9+:</p>
+     * <ul>
+     *     <li>0:  No compression. Equivalent to zip-0.</li>
+     *     <li>1:  Constant String Sharing</li>
+     *     <li>2:  Equivalent to zip-6.</li>
+     * </ul>
+     *
+     * <p>For JDK 21+, those values are deprecated and to be removed in a future version.
+     * The supported values are:<br>
+     * {@code zip-[0-9]}, where {@code zip-0} provides no compression,
+     * and {@code zip-9} provides the best compression.<br>
+     * Default is {@code zip-6}.</p>
      */
     @Parameter
-    private Integer compress;
+    private String compress;
 
     /**
-     * Should the plugin generate a launcher script by means of jlink? The command line equivalent is:
-     * <code>--launcher &lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>. The valid values for the level are:
+     * Should the plugin generate a launcher script by means of jlink? The command line equivalent
+     * is:
+     * <code>--launcher &lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>. The valid values
+     * for
+     * the level are:
      * <code>&lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>.
      */
     @Parameter
@@ -134,14 +161,15 @@ public class JLinkMojo extends AbstractJLinkMojo {
      *   &lt;/addOptions&gt;
      * </pre>
      *
-     * <p>Above example will result in {@code jlink --add-options="-Xmx256m" --enable-preview -Dvar=value"}.</p>
+     * <p>Above example will result in
+     * {@code jlink --add-options="-Xmx256m" --enable-preview -Dvar=value"}.</p>
      */
     @Parameter
     private List<String> addOptions;
 
     /**
-     * Limit the universe of observable modules. The following gives an example of the configuration which can be used
-     * in the <code>pom.xml</code> file.
+     * Limit the universe of observable modules. The following gives an example of the configuration
+     * which can be used in the <code>pom.xml</code> file.
      *
      * <pre>
      *   &lt;limitModules&gt;
@@ -151,7 +179,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      *     .
      *   &lt;/limitModules&gt;
      * </pre>
-     *
+     * <p>
      * This configuration is the equivalent of the command line option:
      * <code>--limit-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>
      */
@@ -160,10 +188,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     /**
      * <p>
-     * Usually this is not necessary, cause this is handled automatically by the given dependencies.
+     * Usually this is not necessary, cause this is handled automatically by the given
+     * dependencies.
      * </p>
      * <p>
-     * By using the --add-modules you can define the root modules to be resolved. The configuration in
+     * By using the --add-modules you can define the root modules to be resolved. The configuration
+     * in
      * <code>pom.xml</code> file can look like this:
      * </p>
      *
@@ -175,26 +205,29 @@ public class JLinkMojo extends AbstractJLinkMojo {
      *   .
      * &lt;/addModules&gt;
      * </pre>
-     *
-     * The command line equivalent for jlink is: <code>--add-modules &lt;mod&gt;[,&lt;mod&gt;...]</code>.
+     * <p>
+     * The command line equivalent for jlink is: <code>--add-modules
+     * &lt;mod&gt;[,&lt;mod&gt;...]</code>.
      */
     @Parameter
     private List<String> addModules;
 
     /**
-     * Define the plugin module path to be used. There can be defined multiple entries separated by either {@code ;} or
-     * {@code :}. The jlink command line equivalent is: <code>--plugin-module-path &lt;modulepath&gt;</code>
+     * Define the plugin module path to be used. There can be defined multiple entries separated by
+     * either {@code ;} or {@code :}. The jlink command line equivalent is:
+     * <code>--plugin-module-path &lt;modulepath&gt;</code>
      */
     @Parameter
     private String pluginModulePath;
 
     /**
-     * The output directory for the resulting Run Time Image. The created Run Time Image is stored in non compressed
-     * form. This will later being packaged into a <code>zip</code> file. <code>--output &lt;path&gt;</code>
+     * The output directory for the resulting Run Time Image. The created Run Time Image is stored
+     * in non compressed form. This will later being packaged into a <code>zip</code> file.
+     * <code>--output &lt;path&gt;</code>
      *
      * <p>The {@link #classifier} is appended as a subdirecty if it exists,
-     * otherwise {@code default} will be used as subdirectory.
-     * This ensures that multiple executions using classifiers will not overwrite the previous run’s image.</p>
+     * otherwise {@code default} will be used as subdirectory. This ensures that multiple executions
+     * using classifiers will not overwrite the previous run’s image.</p>
      */
     @Parameter(defaultValue = "${project.build.directory}/maven-jlink", required = true, readonly = true)
     private File outputDirectoryImage;
@@ -206,16 +239,16 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private File outputDirectory;
 
     /**
-     * The byte order of the generated Java Run Time image. <code>--endian &lt;little|big&gt;</code>. If the endian is
-     * not given the default is: <code>native</code>.
+     * The byte order of the generated Java Run Time image. <code>--endian
+     * &lt;little|big&gt;</code>. If the endian is not given the default is: <code>native</code>.
      */
     // TODO: Should we define either little or big as default? or should we left as it.
     @Parameter
     private String endian;
 
     /**
-     * Include additional paths on the <code>--module-path</code> option. Project dependencies and JDK modules are
-     * automatically added.
+     * Include additional paths on the <code>--module-path</code> option. Project dependencies and
+     * JDK modules are automatically added.
      */
     @Parameter
     private List<String> modulePaths;
@@ -239,15 +272,15 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private boolean ignoreSigningInformation;
 
     /**
-     * This will suppress to have an <code>includes</code> directory in the resulting Java Run Time Image. The JLink
-     * command line equivalent is: <code>--no-header-files</code>
+     * This will suppress to have an <code>includes</code> directory in the resulting Java Run Time
+     * Image. The JLink command line equivalent is: <code>--no-header-files</code>
      */
     @Parameter(defaultValue = "false")
     private boolean noHeaderFiles;
 
     /**
-     * This will suppress to have the <code>man</code> directory in the resulting Java Run Time Image. The JLink command
-     * line equivalent is: <code>--no-man-pages</code>
+     * This will suppress to have the <code>man</code> directory in the resulting Java Run Time
+     * Image. The JLink command line equivalent is: <code>--no-man-pages</code>
      */
     @Parameter(defaultValue = "false")
     private boolean noManPages;
@@ -263,7 +296,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      *   .
      * &lt;/suggestProviders&gt;
      * </pre>
-     *
+     * <p>
      * The jlink command linke equivalent: <code>--suggest-providers [&lt;name&gt;,...]</code>
      */
     @Parameter
@@ -309,17 +342,17 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private File sourceJdkModules;
 
     /**
-     * Classifier to add to the artifact generated. If given, the artifact will be attached
-     * as a supplemental artifact.
-     * If not given this will create the main artifact which is the default behavior.
-     * If you try to do that a second time without using a classifier the build will fail.
+     * Classifier to add to the artifact generated. If given, the artifact will be attached as a
+     * supplemental artifact. If not given this will create the main artifact which is the default
+     * behavior. If you try to do that a second time without using a classifier the build will
+     * fail.
      */
     @Parameter
     private String classifier;
 
     /**
-     * Name of the generated ZIP file in the <code>target</code> directory. This will not change the name of the
-     * installed/deployed file.
+     * Name of the generated ZIP file in the <code>target</code> directory. This will not change the
+     * name of the installed/deployed file.
      */
     @Parameter(defaultValue = "${project.build.finalName}", readonly = true)
     private String finalName;
@@ -480,7 +513,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
     }
 
     /**
-     * @return true in case where the classifier is not {@code null} and contains something else than white spaces.
+     * @return true in case where the classifier is not {@code null} and contains something else
+     * than white spaces.
      */
     protected boolean hasClassifier() {
         boolean result = false;
@@ -509,11 +543,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
     }
 
     private void failIfParametersAreNotInTheirValidValueRanges() throws MojoFailureException {
-        if (compress != null && (compress < 0 || compress > 2)) {
-            String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
-            getLog().error(message);
-            throw new MojoFailureException(message);
-        }
+        checkCompressParameter(this.compress);
 
         if (endian != null && (!"big".equals(endian) && !"little".equals(endian))) {
             String message = "The given endian parameter " + endian
@@ -525,6 +555,39 @@ public class JLinkMojo extends AbstractJLinkMojo {
         if (addOptions != null && !addOptions.isEmpty()) {
             requireJdk14();
         }
+    }
+
+    protected static void checkCompressParameter(@Nullable String compress) throws MojoFailureException {
+        if (compress == null) {
+            // no compress argument given
+            return;
+        }
+
+        if (compress.length() == 1 && Character.isDigit(compress.charAt(0))) {
+            // single digit is valid at least up to Java 21
+            String message = "The given single-digit compress parameter " + compress
+                    + " is not in the valid value range from 0..2";
+
+            try {
+                int parsed = Integer.parseInt(compress, 10);
+                if (parsed >= 0 && parsed <= 2) {
+                    return;
+                }
+
+                throw new MojoFailureException(message);
+            } catch (NumberFormatException nfe) {
+                throw new MojoFailureException(message, nfe);
+            }
+        }
+
+        if (COMPRESSION_STRING.matcher(compress).matches()) {
+            // valid 'zip-n' input
+            return;
+        }
+
+        final String message = "Compression level argument '" + compress + "' is not a valid input. "
+                + "Accepted values: 0…2 (JDK 9 to 21) or zip-<n> (JDK 21+, preferred).";
+        throw new MojoFailureException(message);
     }
 
     private void requireJdk14() throws MojoFailureException {
@@ -597,7 +660,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
         if (compress != null) {
             jlinkArgs.add("--compress");
-            jlinkArgs.add(compress + "");
+            jlinkArgs.add(compress);
         }
         if (launcher != null) {
             jlinkArgs.add("--launcher");

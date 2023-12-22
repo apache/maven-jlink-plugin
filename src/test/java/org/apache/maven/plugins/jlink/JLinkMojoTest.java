@@ -21,7 +21,11 @@ package org.apache.maven.plugins.jlink;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.apache.maven.plugin.MojoFailureException;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,5 +44,39 @@ public class JLinkMojoTest {
 
         // then
         assertThat(jlinkArgs).noneMatch(arg -> arg.trim().isBlank());
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                "0,true",
+                "1,true",
+                "2,true",
+                "3,false",
+                "9,false",
+                // empty string is not valid.
+                "'',false",
+                // null is valid (i.e. not set).
+                ",true",
+                "zip,false",
+                "zip-0,true",
+                "zip-6,true",
+                "zip-9,true",
+                "zip-10,false",
+            })
+    void accepts_only_valid_compression_levels(String compress, boolean acceptable) {
+        try {
+            JLinkMojo.checkCompressParameter(compress);
+        } catch (MojoFailureException e) {
+            if (acceptable) {
+                Assertions.fail("Value [" + compress + "] should have been a valid value", e);
+            }
+
+            return;
+        }
+
+        if (!acceptable) {
+            Assertions.fail("Value [" + compress + "] should not have been a valid value");
+        }
     }
 }
