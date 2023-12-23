@@ -105,10 +105,25 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     /**
      * Here you can define the compression of the resources being used. The command line equivalent is:
-     * <code>-c, --compress=level&gt;</code>. The valid values for the level are: <code>0, 1, 2</code>.
+     * <code>-c, --compress=&lt;level&gt;</code>.
+     *
+     * <p>The valid values for the level depend on the JDK:</p>
+     *
+     * <p>For JDK 9+:</p>
+     * <ul>
+     *     <li>0:  No compression. Equivalent to zip-0.</li>
+     *     <li>1:  Constant String Sharing</li>
+     *     <li>2:  Equivalent to zip-6.</li>
+     * </ul>
+     *
+     * <p>For JDK 21+, those values are deprecated and to be removed in a future version.
+     * The supported values are:<br>
+     * {@code zip-[0-9]}, where {@code zip-0} provides no compression,
+     * and {@code zip-9} provides the best compression.<br>
+     * Default is {@code zip-6}.</p>
      */
     @Parameter
-    private Integer compress;
+    private String compress;
 
     /**
      * Should the plugin generate a launcher script by means of jlink? The command line equivalent is:
@@ -509,12 +524,6 @@ public class JLinkMojo extends AbstractJLinkMojo {
     }
 
     private void failIfParametersAreNotInTheirValidValueRanges() throws MojoFailureException {
-        if (compress != null && (compress < 0 || compress > 2)) {
-            String message = "The given compress parameters " + compress + " is not in the valid value range from 0..2";
-            getLog().error(message);
-            throw new MojoFailureException(message);
-        }
-
         if (endian != null && (!"big".equals(endian) && !"little".equals(endian))) {
             String message = "The given endian parameter " + endian
                     + " does not contain one of the following values: 'little' or 'big'.";
@@ -597,7 +606,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
         if (compress != null) {
             jlinkArgs.add("--compress");
-            jlinkArgs.add(compress + "");
+            jlinkArgs.add(compress);
         }
         if (launcher != null) {
             jlinkArgs.add("--launcher");
