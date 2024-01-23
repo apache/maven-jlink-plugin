@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -340,6 +342,16 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private String finalName;
 
     /**
+     * Timestamp for reproducible output archive entries, either formatted as ISO 8601
+     * <code>yyyy-MM-dd'T'HH:mm:ssXXX</code> or as an int representing seconds since the epoch (like
+     * <a href="https://reproducible-builds.org/docs/source-date-epoch/">SOURCE_DATE_EPOCH</a>).
+     *
+     * @since 3.2.0
+     */
+    @Parameter(defaultValue = "${project.build.outputTimestamp}")
+    private String outputTimestamp;
+
+    /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
     @Component
@@ -509,6 +521,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
             throws MojoExecutionException {
         zipArchiver.addDirectory(outputDirectoryImage);
+
+        // configure for Reproducible Builds based on outputTimestamp value
+        Date lastModified = new MavenArchiver().parseOutputTimestamp(outputTimestamp);
+        if (lastModified != null) {
+            zipArchiver.configureReproducible(lastModified);
+        }
 
         File resultArchive = getArchiveFile(outputDirectory, finalName, getClassifier(), "zip");
 
