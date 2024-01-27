@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macOS-latest ]
-        java: [ 11, 17, 20 ]
+        java: [ 11, 17, 21 ]
         dist: [ 'temurin', 'semeru' ]
         exclude:
         - os: macos-latest
