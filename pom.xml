@@ -53,7 +53,7 @@
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven-jlink-plugin/</url>
+    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven-jlink-plugin/</url>
   </ciManagement>
   <distributionManagement>
     <site>
@@ -72,12 +72,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>4.0.0</version>
-      </dependency>
-
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
@@ -158,37 +152,6 @@
         <directory>src/main/filtered-resources</directory>
       </resource>
     </resources>
-    <pluginManagement>
-      <plugins>
-        <!-- remove with next parent upgrade -->
-        <plugin>
-          <artifactId>maven-project-info-reports-plugin</artifactId>
-          <version>3.5.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-enforcer-plugin</artifactId>
-          <version>3.4.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.6.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.12.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.12.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.11.0</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <reporting>
@@ -237,7 +200,7 @@
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <environmentVariables>
                 <!--
-                  ! Prevent reading the .mavenrc or maven_pre.bat on Windows 
+                  ! Prevent reading the .mavenrc or maven_pre.bat on Windows
                   ! in integration tests.
                 -->
                 <MAVEN_SKIP_RC>1</MAVEN_SKIP_RC>
