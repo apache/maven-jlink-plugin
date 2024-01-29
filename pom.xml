@@ -28,7 +28,7 @@
   </parent>
 
   <artifactId>maven-jlink-plugin</artifactId>
-  <version>3.2.0</version>
+  <version>3.2.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven JLink Plugin</name>
@@ -43,7 +43,7 @@
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-jlink-plugin.git</developerConnection>
-    <tag>maven-jlink-plugin-3.2.0</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/apache/maven-jlink-plugin/tree/${project.scm.tag}</url>
   </scm>
 
@@ -67,7 +67,7 @@
     <maven.compiler.release>11</maven.compiler.release>
     <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
     <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
-    <project.build.outputTimestamp>2024-01-29T19:21:20Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-01-29T19:21:50Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
