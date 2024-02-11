@@ -632,7 +632,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
         if (addOptions != null && !addOptions.isEmpty()) {
             jlinkArgs.add("--add-options");
-            jlinkArgs.add(String.format("\"%s\"", String.join(" ", addOptions)));
+            jlinkArgs.add(String.join(" ", addOptions));
         }
 
         if (disablePlugin != null) {
