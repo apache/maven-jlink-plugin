@@ -53,6 +53,7 @@ import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.archiver.MavenArchiver;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -62,6 +63,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.shared.filtering.MavenFilteringException;
+import org.apache.maven.shared.filtering.MavenResourcesExecution;
+import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
@@ -357,6 +361,17 @@ public class JLinkMojo extends AbstractJLinkMojo {
     @Component
     private MavenProjectHelper projectHelper;
 
+    /**
+     * These file are added to the image after calling the jlink, but before creating the zipfile.
+     *
+     * @since 3.2.0
+     */
+    @Parameter
+    private List<Resource> additionalResources;
+
+    @Component(role = MavenResourcesFiltering.class, hint = "default")
+    private MavenResourcesFiltering mavenResourcesFiltering;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         failIfParametersAreNotInTheirValidValueRanges();
@@ -398,6 +413,20 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jLinkExec.executeJlink(jlinkArgs);
         } catch (IllegalStateException e) {
             throw new MojoFailureException("Unable to find jlink command: " + e.getMessage(), e);
+        }
+
+        // Add additional resources
+        try {
+            mavenResourcesFiltering.filterResources(new MavenResourcesExecution(
+                    additionalResources,
+                    outputDirectoryImage,
+                    getProject(),
+                    "UTF-8",
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    getSession()));
+        } catch (MavenFilteringException e) {
+            throw new MojoFailureException("Unable to copy the additional resources: " + e.getMessage(), e);
         }
 
         File createZipArchiveFromImage = createZipArchiveFromImage(buildDirectory, outputDirectoryImage);
