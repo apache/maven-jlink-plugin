@@ -140,6 +140,15 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private String launcher;
 
     /**
+     * Specify one or more launchers for jlink.
+     * The command line equivalent is:
+     * <code>--launcher &lt;name&gt;=&lt;module&gt;[/&lt;mainclass&gt;]</code>.
+     * The valid values are a list of &lt;launcher&gt; elements, see {@link launcher}.</code>.
+     */
+    @Parameter
+    private List<String> launchers;
+
+    /**
      * These JVM arguments will be appended to the {@code lib/modules} file.<br>
      * <strong>This parameter requires at least JDK 14.<br></strong>
      *
@@ -633,7 +642,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
     }
 
-    protected List<String> createJlinkArgs(Collection<String> pathsOfModules, Collection<String> modulesToAdd) {
+    protected List<String> createJlinkArgs(Collection<String> pathsOfModules, Collection<String> modulesToAdd)
+            throws MojoExecutionException {
         List<String> jlinkArgs = new ArrayList<>();
 
         if (stripDebug) {
@@ -656,8 +666,17 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add(compress);
         }
         if (launcher != null) {
-            jlinkArgs.add("--launcher");
-            jlinkArgs.add(launcher);
+            if (launchers != null) {
+                throw new MojoExecutionException("Specify either single <launcher> or multiple <launchers>, not both.");
+            } else {
+                launchers = List.of(launcher);
+            }
+        }
+        if (launchers != null) {
+            for (String item : launchers) {
+                jlinkArgs.add("--launcher");
+                jlinkArgs.add(item);
+            }
         }
         if (addOptions != null && !addOptions.isEmpty()) {
             jlinkArgs.add("--add-options");
