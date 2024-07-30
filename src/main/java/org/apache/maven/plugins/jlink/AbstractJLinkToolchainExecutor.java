@@ -43,8 +43,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.utils.cli.CommandLineException;
@@ -131,7 +129,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
         }
 
         // TODO: Check if there exist a more elegant way?
-        String jLinkCommand = "jlink" + (SystemUtils.IS_OS_WINDOWS ? ".exe" : "");
+        String jLinkCommand = "jlink" + (isOSWindows() ? ".exe" : "");
 
         File jLinkExe = new File(jLinkExecutable);
 
@@ -139,7 +137,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
             jLinkExe = new File(jLinkExe, jLinkCommand);
         }
 
-        if (SystemUtils.IS_OS_WINDOWS && jLinkExe.getName().indexOf('.') < 0) {
+        if (isOSWindows() && jLinkExe.getName().indexOf('.') < 0) {
             jLinkExe = new File(jLinkExe.getPath() + ".exe");
         }
 
@@ -160,9 +158,8 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
         try {
             int exitCode = CommandLineUtils.executeCommandLine(cmd, out, err);
 
-            String output = StringUtils.isEmpty(out.getOutput())
-                    ? null
-                    : '\n' + out.getOutput().trim();
+            String output =
+                    out.getOutput().isBlank() ? null : '\n' + out.getOutput().trim();
 
             if (exitCode != 0) {
 
@@ -176,7 +173,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
 
                 StringBuilder msg = new StringBuilder("\nExit code: ");
                 msg.append(exitCode);
-                if (StringUtils.isNotEmpty(err.getOutput())) {
+                if (!err.getOutput().isBlank()) {
                     msg.append(" - ").append(err.getOutput());
                 }
                 msg.append('\n');
@@ -196,5 +193,19 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
         } catch (CommandLineException e) {
             throw new MojoExecutionException("Unable to execute jlink command: " + e.getMessage(), e);
         }
+    }
+
+    private static boolean isOSWindows() {
+        String osName;
+        try {
+            osName = System.getProperty("os.name");
+        } catch (final SecurityException ex) {
+            // we are not allowed to look at this property
+            return false;
+        }
+        if (osName == null) {
+            return false;
+        }
+        return osName.startsWith("Windows");
     }
 }
