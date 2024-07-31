@@ -41,6 +41,7 @@ import java.io.File;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -72,9 +73,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
     public int executeJlink(List<String> jlinkArgs) throws MojoExecutionException {
         File jlinkExecutable = getJlinkExecutable();
         getLog().info("Toolchain in maven-jlink-plugin: jlink [ " + jlinkExecutable + " ]");
-
-        Commandline cmd = createJLinkCommandLine(jlinkArgs);
-        cmd.setExecutable(jlinkExecutable.getAbsolutePath());
+        Commandline cmd = createJLinkCommandLine(jlinkExecutable, jlinkArgs);
 
         return executeCommand(cmd);
     }
@@ -100,10 +99,15 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
         return Optional.of(jmodsFolder);
     }
 
-    private Commandline createJLinkCommandLine(List<String> jlinkArgs) {
+    static Commandline createJLinkCommandLine(File jlinkExecutable, List<String> jlinkArgs) {
         Commandline cmd = new Commandline();
-        jlinkArgs.forEach(arg -> cmd.createArg().setValue("\"" + arg + "\""));
+        // Don't quote every argument with single quote, but instead quote them with double quotes
+        // and enclose all of them with single quotes to then be passed to the shell command as
+        // /bin/sh -c '<all arguments, each one quoted with double quotes>'
+        cmd.getShell().setQuotedArgumentsEnabled(false);
 
+        String jlinkArgsStr = jlinkArgs.stream().map(arg -> "\"" + arg + "\"").collect(Collectors.joining(" "));
+        cmd.setExecutable(jlinkExecutable.getAbsolutePath() + " " + jlinkArgsStr);
         return cmd;
     }
 
@@ -148,7 +152,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
     private int executeCommand(Commandline cmd) throws MojoExecutionException {
         if (getLog().isDebugEnabled()) {
             // no quoted arguments ???
-            getLog().debug(CommandLineUtils.toString(cmd.getCommandline()).replaceAll("'", ""));
+            getLog().debug(CommandLineUtils.toString(cmd.getCommandline()));
         }
 
         CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
