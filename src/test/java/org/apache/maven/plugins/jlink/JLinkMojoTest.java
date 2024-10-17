@@ -18,9 +18,11 @@
  */
 package org.apache.maven.plugins.jlink;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.apache.maven.shared.utils.cli.Commandline;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JLinkMojoTest {
 
     @Test
-    void quote_every_argument() throws Exception {
+    void double_quote_every_argument() throws Exception {
         // given
         JLinkMojo mojo = new JLinkMojo();
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
@@ -40,5 +42,23 @@ public class JLinkMojoTest {
 
         // then
         assertThat(jlinkArgs).noneMatch(arg -> arg.trim().isBlank());
+    }
+
+    @Test
+    void single_quotes_shell_command() throws Exception {
+        // given
+        JLinkMojo mojo = new JLinkMojo();
+        Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
+        stripDebug.setAccessible(true);
+        stripDebug.set(mojo, Boolean.TRUE);
+
+        // when
+        List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
+        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
+
+        // then
+        assertThat(cmdLine.toString())
+                .isEqualTo(
+                        "/bin/sh -c '/path/to/jlink \"--strip-debug\" \"--module-path\" \"foo:bar\" \"--add-modules\" \"mvn,jlink\"'");
     }
 }
