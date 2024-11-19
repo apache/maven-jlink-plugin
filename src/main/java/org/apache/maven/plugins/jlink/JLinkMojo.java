@@ -704,12 +704,6 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add("--no-man-pages");
         }
 
-        if (hasSuggestProviders()) {
-            jlinkArgs.add("--suggest-providers");
-            String sb = getCommaSeparatedList(suggestProviders);
-            jlinkArgs.add(sb);
-        }
-
         if (hasLimitModules()) {
             jlinkArgs.add("--limit-modules");
             String sb = getCommaSeparatedList(limitModules);
@@ -745,6 +739,13 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         if (verbose) {
             jlinkArgs.add("--verbose");
+        }
+
+        // NOTE: suggestProviders is a terminal JlinkTask, so must be at the end!
+        if (hasSuggestProviders()) {
+            jlinkArgs.add("--suggest-providers");
+            String sb = getCommaSeparatedList(suggestProviders);
+            jlinkArgs.add(sb);
         }
 
         return Collections.unmodifiableList(jlinkArgs);
