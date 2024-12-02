@@ -30,7 +30,7 @@ public class JLinkMojoTest {
     @Test
     void quote_every_argument() throws Exception {
         // given
-        JLinkMojo mojo = new JLinkMojo();
+        JLinkMojo mojo = new JLinkMojo(null, null, null, null);
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
         stripDebug.setAccessible(true);
         stripDebug.set(mojo, Boolean.TRUE);
