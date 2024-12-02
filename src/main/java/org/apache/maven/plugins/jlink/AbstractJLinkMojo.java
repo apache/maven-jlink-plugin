@@ -71,7 +71,7 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
-    private ToolchainManager toolchainManager;
+    private final ToolchainManager toolchainManager;
 
     public AbstractJLinkMojo(ToolchainManager toolchainManager) {
         this.toolchainManager = toolchainManager;
