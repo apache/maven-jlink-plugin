@@ -564,7 +564,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         zipArchiver.addDirectory(outputDirectoryImage);
 
         // configure for Reproducible Builds based on outputTimestamp value
-        Optional<Instant> lastModified = new MavenArchiver().parseBuildOutputTimestamp(outputTimestamp);
+        Optional<Instant> lastModified = MavenArchiver.parseBuildOutputTimestamp(outputTimestamp);
         if (lastModified.isPresent()) {
             zipArchiver.configureReproducibleBuild(FileTime.from(lastModified.get()));
         }
