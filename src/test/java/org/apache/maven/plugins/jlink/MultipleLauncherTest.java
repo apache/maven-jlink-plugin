@@ -34,17 +34,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class MultipleLauncherTest {
 
     private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
-    private Field launcher;
-
-    @BeforeEach
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        // It's OK to specify one launcher with "<launcher>" given
-        launcher = mojo.getClass().getDeclaredField("launcher");
-        launcher.setAccessible(true);
-    }
 
     @Test
     void testSingleLauncher() throws Exception {
+        // It's OK to specify one launcher with "<launcher>" given
+        Field launcher = mojo.getClass().getDeclaredField("launcher");
+        launcher.setAccessible(true);
         launcher.set(mojo, "l=com.example.Launch");
 
         // when
@@ -69,7 +64,9 @@ public class MultipleLauncherTest {
 
     @Test
     void testMultipleLaunchers() throws Exception {
-        launcher.set(mojo, List.of("l1=com.example.Launch1", "l2=com.example.Launch2"));
+        Field launchers = mojo.getClass().getDeclaredField("launchers");
+        launchers.setAccessible(true);
+        launchers.set(mojo, List.of("l1=com.example.Launch1", "l2=com.example.Launch2"));
 
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
@@ -80,6 +77,9 @@ public class MultipleLauncherTest {
 
     @Test
     void testInvalidLauncherConfig() throws Exception {
+        // It's OK to specify one launcher with "<launcher>" given
+        Field launcher = mojo.getClass().getDeclaredField("launcher");
+        launcher.setAccessible(true);
         launcher.set(mojo, "l3=com.example.Launch3");
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
