@@ -51,6 +51,7 @@ public class MultipleLauncherTest {
 
     @Test
     void testOneMultipleLauncher() throws Exception {
+        // It's OK to specify one launcher with "<launchers>"
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
         launchers.set(mojo, List.of("l=com.example.Launch"));
@@ -64,6 +65,7 @@ public class MultipleLauncherTest {
 
     @Test
     void testMultipleLaunchers() throws Exception {
+        // It's OK to specify multiple launchers with the "<launchers>" element
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
         launchers.set(mojo, List.of("l1=com.example.Launch1", "l2=com.example.Launch2"));
@@ -77,7 +79,7 @@ public class MultipleLauncherTest {
 
     @Test
     void testInvalidLauncherConfig() throws Exception {
-        // It's OK to specify one launcher with "<launcher>" given
+        // It's an error to specify both "<launcher>" and "<launchers>"
         Field launcher = mojo.getClass().getDeclaredField("launcher");
         launcher.setAccessible(true);
         launcher.set(mojo, "l3=com.example.Launch3");
