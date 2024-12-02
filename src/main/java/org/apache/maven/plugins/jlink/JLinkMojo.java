@@ -378,11 +378,11 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
-    private MavenResourcesFiltering mavenResourcesFiltering;
+    private final MavenResourcesFiltering mavenResourcesFiltering;
 
-    private LocationManager locationManager;
+    private final LocationManager locationManager;
 
     @Inject
     public JLinkMojo(
