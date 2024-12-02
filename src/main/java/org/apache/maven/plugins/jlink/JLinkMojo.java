@@ -39,10 +39,11 @@ package org.apache.maven.plugins.jlink;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -373,7 +374,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private MavenProjectHelper projectHelper;
 
     /**
-     * These file are added to the image after calling the jlink, but before creating the zipfile.
+     * These files are added to the image after calling the jlink, but before creating the zipfile.
      *
      * @since 3.2.0
      */
@@ -478,8 +479,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
             Optional<Toolchain> toolchain = getToolchain();
             if (toolchain.isPresent()
                     && toolchain.orElseThrow(NoSuchElementException::new) instanceof DefaultJavaToolChain) {
-                Toolchain toolcahin1 = toolchain.orElseThrow(NoSuchElementException::new);
-                request.setJdkHome(new File(((DefaultJavaToolChain) toolcahin1).getJavaHome()));
+                Toolchain toolchain1 = toolchain.orElseThrow(NoSuchElementException::new);
+                request.setJdkHome(new File(((DefaultJavaToolChain) toolchain1).getJavaHome()));
             }
 
             ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths(request);
@@ -563,9 +564,9 @@ public class JLinkMojo extends AbstractJLinkMojo {
         zipArchiver.addDirectory(outputDirectoryImage);
 
         // configure for Reproducible Builds based on outputTimestamp value
-        Date lastModified = new MavenArchiver().parseOutputTimestamp(outputTimestamp);
-        if (lastModified != null) {
-            zipArchiver.configureReproducible(lastModified);
+        Optional<Instant> lastModified = new MavenArchiver().parseBuildOutputTimestamp(outputTimestamp);
+        if (lastModified.isPresent()) {
+            zipArchiver.configureReproducibleBuild(FileTime.from(lastModified.get()));
         }
 
         File resultArchive = getArchiveFile(outputDirectory, finalName, getClassifier(), "zip");
