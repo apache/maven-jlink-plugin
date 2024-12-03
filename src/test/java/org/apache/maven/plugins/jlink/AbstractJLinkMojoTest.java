@@ -112,18 +112,4 @@ public class AbstractJLinkMojoTest {
         String result = mojoMock.getPlatformDependSeparateList(Arrays.asList("A", "B", "C"));
         assertThat(result).isEqualTo("A" + File.pathSeparatorChar + "B" + File.pathSeparatorChar + "C");
     }
-
-    @Test
-    @DisplayName("getCommaSeparatedList() should return a single character")
-    public void getCommaSeparatedListShouldReturnASingleCharacter() {
-        String result = String.join( ",", Collections.singletonList( "A" ) );
-        assertThat(result).isEqualTo("A");
-    }
-
-    @Test
-    @DisplayName("getCommaSeparatedList() should return two characters separated by comma")
-    public void getCommaSeparatedListShouldReturnTwoCharactersSeparatedByComma() {
-        String result = String.join( ",", Arrays.asList( "A", "B" ) );
-        assertThat(result).isEqualTo("A,B");
-    }
 }
