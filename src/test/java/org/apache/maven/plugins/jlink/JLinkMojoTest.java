@@ -76,6 +76,6 @@ public class JLinkMojoTest {
         assertThat(cmdLine.toString()).startsWith("cmd.exe ");
         assertThat(cmdLine.toString())
                 .contains(
-                        "\\path\\to\\jlink \"-strip-debug\" \"module-path\" \"foo;bar\" \"-add-modules\" \"mvn,jlink");
+                        "\\path\\to\\jlink \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink");
     }
 }
