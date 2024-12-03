@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.maven.shared.utils.cli.Commandline;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,6 +47,10 @@ public class JLinkMojoTest {
 
     @Test
     void single_quotes_shell_command() throws Exception {
+
+        Assumptions.assumeFalse("windows".equals(System.getProperty("os.name")));
+        // TODO add a test for Windows
+
         // given
         JLinkMojo mojo = new JLinkMojo();
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
