@@ -23,7 +23,6 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.maven.shared.utils.cli.Commandline;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
