@@ -202,12 +202,4 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
         return String.join(Character.toString(File.pathSeparatorChar), modulePaths);
     }
 
-    /**
-     * Convert a list into a
-     * @param modules The list of modules.
-     * @return The string with the module list which is separated by {@code ,}.
-     */
-    protected String getCommaSeparatedList(Collection<String> modules) {
-        return String.join(",", modules);
-    }
 }

@@ -116,14 +116,14 @@ public class AbstractJLinkMojoTest {
     @Test
     @DisplayName("getCommaSeparatedList() should return a single character")
     public void getCommaSeparatedListShouldReturnASingleCharacter() {
-        String result = mojoMock.getCommaSeparatedList(Collections.singletonList("A"));
+        String result = String.join( ",", Collections.singletonList( "A" ) );
         assertThat(result).isEqualTo("A");
     }
 
     @Test
     @DisplayName("getCommaSeparatedList() should return two characters separated by comma")
     public void getCommaSeparatedListShouldReturnTwoCharactersSeparatedByComma() {
-        String result = mojoMock.getCommaSeparatedList(Arrays.asList("A", "B"));
+        String result = String.join( ",", Arrays.asList( "A", "B" ) );
         assertThat(result).isEqualTo("A,B");
     }
 }
