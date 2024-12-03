@@ -173,15 +173,15 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
 
     /**
      * This will convert a module path separated by either {@code :} or {@code ;} into a string which uses the platform
-     * depend path separator uniformly.
+     * path separator uniformly.
      *
-     * @param pluginModulePath The module path.
-     * @return The platform separated module path.
+     * @param pluginModulePath the module path
+     * @return the platform separated module path
      */
     protected StringBuilder convertSeparatedModulePathToPlatformSeparatedModulePath(String pluginModulePath) {
         StringBuilder sb = new StringBuilder();
-        // Split the module path by either ":" or ";" linux/windows path separator and
-        // convert uniformly to the platform used separator.
+        // Split the module path by either ":" or ";" Linux/Windows path separator and
+        // convert uniformly to the platform separator.
         String[] splitModule = pluginModulePath.split("[;:]");
         for (String module : splitModule) {
             if (sb.length() > 0) {
@@ -193,19 +193,20 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
     }
 
     /**
-     * Convert a list into a string which is separated by platform depend path separator.
+     * Convert a list into a string which is separated by the platform path separator.
      *
-     * @param modulePaths The list of elements.
-     * @return The string which contains the elements separated by {@link File#pathSeparatorChar}.
+     * @param modulePaths the list of elements
+     * @return the string which contains the elements separated by {@link File#pathSeparatorChar}.
      */
     protected String getPlatformDependSeparateList(Collection<String> modulePaths) {
         return String.join(Character.toString(File.pathSeparatorChar), modulePaths);
     }
 
     /**
-     * Convert a list into a
-     * @param modules The list of modules.
-     * @return The string with the module list which is separated by {@code ,}.
+     * Convert a list of modules into a comma separated string.
+     *
+     * @param modules the list of modules
+     * @return the string with the module list which is separated by {@code ,}
      */
     protected String getCommaSeparatedList(Collection<String> modules) {
         return String.join(",", modules);

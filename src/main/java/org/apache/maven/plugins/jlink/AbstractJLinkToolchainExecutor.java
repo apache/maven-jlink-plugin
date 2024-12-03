@@ -118,7 +118,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
             getLog().error("Either JDK9+ or a toolchain "
                     + "pointing to a JDK9+ containing a jlink binary is required.");
             getLog().info("See https://maven.apache.org/guides/mini/guide-using-toolchains.html "
-                    + "for mor information.");
+                    + "for more information.");
             throw new IllegalStateException("Running on JDK8 and no toolchain found.");
         }
 
@@ -166,9 +166,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
 
             if (exitCode != 0) {
 
-                if (output != null && !output.isEmpty()) {
-                    // Reconsider to use WARN / ERROR ?
-                    //  getLog().error( output );
+                if (output != null) {
                     for (String outputLine : output.split("\n")) {
                         getLog().error(outputLine);
                     }
@@ -185,8 +183,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
                 throw new MojoExecutionException(msg.toString());
             }
 
-            if (output != null && !output.isEmpty()) {
-                // getLog().info( output );
+            if (output != null) {
                 for (String outputLine : output.split("\n")) {
                     getLog().info(outputLine);
                 }
