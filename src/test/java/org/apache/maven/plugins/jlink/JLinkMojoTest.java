@@ -24,20 +24,25 @@ import java.util.List;
 
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JLinkMojoTest {
 
-    @Test
-    void double_quote_every_argument() throws Exception {
+    private JLinkMojo mojo = new JLinkMojo();
+
+    @BeforeEach
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
         // given
-        JLinkMojo mojo = new JLinkMojo();
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
         stripDebug.setAccessible(true);
         stripDebug.set(mojo, Boolean.TRUE);
+    }
 
+    @Test
+    void double_quote_every_argument() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
 
@@ -46,16 +51,8 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void single_quotes_shell_command() throws Exception {
-
-        Assumptions.assumeFalse("windows".equals(System.getProperty("os.name")));
-        // TODO add a test for Windows
-
-        // given
-        JLinkMojo mojo = new JLinkMojo();
-        Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
-        stripDebug.setAccessible(true);
-        stripDebug.set(mojo, Boolean.TRUE);
+    void single_quotes_shell_command_unix() throws Exception {
+        Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Windows"));
 
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
@@ -65,5 +62,20 @@ public class JLinkMojoTest {
         assertThat(cmdLine.toString())
                 .isEqualTo(
                         "/bin/sh -c '/path/to/jlink \"--strip-debug\" \"--module-path\" \"foo:bar\" \"--add-modules\" \"mvn,jlink\"'");
+    }
+
+    @Test
+    void single_quotes_shell_command_windows() throws Exception {
+        Assumptions.assumeTrue(System.getProperty("os.name").startsWith("Windows"));
+
+        // when
+        List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
+        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
+
+        // then
+        assertThat(cmdLine.toString()).startsWith("cmd.exe ");
+        assertThat(cmdLine.toString())
+                .contains(
+                        "\\path\\to\\jlink \"-strip-debug\" \"module-path\" \"foo;bar\" \"-add-modules\" \"mvn,jlink");
     }
 }
