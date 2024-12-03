@@ -26,6 +26,9 @@ import org.apache.maven.shared.utils.cli.Commandline;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,10 +53,9 @@ public class JLinkMojoTest {
         assertThat(jlinkArgs).noneMatch(arg -> arg.trim().isBlank());
     }
 
+    @DisabledOnOs(OS.WINDOWS)
     @Test
     void single_quotes_shell_command_unix() throws Exception {
-        Assumptions.assumeFalse(System.getProperty("os.name").startsWith("Windows"));
-
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
@@ -64,10 +66,9 @@ public class JLinkMojoTest {
                         "/bin/sh -c '/path/to/jlink \"--strip-debug\" \"--module-path\" \"foo:bar\" \"--add-modules\" \"mvn,jlink\"'");
     }
 
+    @EnabledOnOs(OS.WINDOWS)
     @Test
     void single_quotes_shell_command_windows() throws Exception {
-        Assumptions.assumeTrue(System.getProperty("os.name").startsWith("Windows"));
-
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
