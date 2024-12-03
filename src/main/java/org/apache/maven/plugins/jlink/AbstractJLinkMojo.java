@@ -201,5 +201,4 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
     protected String getPlatformDependSeparateList(Collection<String> modulePaths) {
         return String.join(Character.toString(File.pathSeparatorChar), modulePaths);
     }
-
 }
