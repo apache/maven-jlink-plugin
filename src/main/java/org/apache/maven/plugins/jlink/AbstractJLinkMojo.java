@@ -46,7 +46,6 @@ import java.util.Optional;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.Toolchain;
@@ -72,8 +71,11 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
     @Parameter(defaultValue = "${session}", readonly = true, required = true)
     private MavenSession session;
 
-    @Component
-    private ToolchainManager toolchainManager;
+    private final ToolchainManager toolchainManager;
+
+    public AbstractJLinkMojo(ToolchainManager toolchainManager) {
+        this.toolchainManager = toolchainManager;
+    }
 
     /**
      * Overload this to produce a zip with another classifier, for example a jlink-zip.
