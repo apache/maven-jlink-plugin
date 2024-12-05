@@ -18,27 +18,63 @@
  */
 package org.apache.maven.plugins.jlink;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.apache.maven.shared.utils.cli.Commandline;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class JLinkMojoTest {
 
-    @Test
-    void quote_every_argument() throws Exception {
-        // given
-        JLinkMojo mojo = new JLinkMojo(null, null, null, null);
+    private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
+
+    @BeforeEach
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
         stripDebug.setAccessible(true);
         stripDebug.set(mojo, Boolean.TRUE);
+    }
 
+    @Test
+    void double_quote_every_argument() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
 
         // then
         assertThat(jlinkArgs).noneMatch(arg -> arg.trim().isBlank());
+    }
+
+    @DisabledOnOs(OS.WINDOWS)
+    @Test
+    void single_quotes_shell_command_unix() throws Exception {
+        // when
+        List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
+        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
+
+        // then
+        assertThat(cmdLine.toString())
+                .isEqualTo(
+                        "/bin/sh -c '/path/to/jlink \"--strip-debug\" \"--module-path\" \"foo:bar\" \"--add-modules\" \"mvn,jlink\"'");
+    }
+
+    @EnabledOnOs(OS.WINDOWS)
+    @Test
+    void single_quotes_shell_command_windows() throws Exception {
+        // when
+        List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
+        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
+
+        // then
+        assertThat(cmdLine.toString()).startsWith("cmd.exe ");
+        assertThat(cmdLine.toString())
+                .contains(
+                        "\\path\\to\\jlink \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink");
     }
 }
