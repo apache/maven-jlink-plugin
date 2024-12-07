@@ -33,11 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class JLinkMojoTest {
 
-    private JLinkMojo mojo = new JLinkMojo();
+    private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
 
     @BeforeEach
     public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        // given
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
         stripDebug.setAccessible(true);
         stripDebug.set(mojo, Boolean.TRUE);
