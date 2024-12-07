@@ -705,7 +705,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         if (pathsOfModules != null && !pathsOfModules.isEmpty()) {
             // @formatter:off
             jlinkArgs.add("--module-path");
-            jlinkArgs.add(getPlatformDependSeparateList(pathsOfModules).replace("\\", "\\\\"));
+            jlinkArgs.add(String.join(File.pathSeparator, pathsOfModules).replace("\\", "\\\\"));
             // @formatter:off
         }
 
