@@ -39,7 +39,6 @@ package org.apache.maven.plugins.jlink;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,7 +56,7 @@ import org.apache.maven.toolchain.ToolchainManager;
 public abstract class AbstractJLinkMojo extends AbstractMojo {
     /**
      * <p>
-     * Specify the requirements for this jdk toolchain. This overrules the toolchain selected by the
+     * Specify the requirements for this JDK toolchain. This overrules the toolchain selected by the
      * maven-toolchain-plugin.
      * </p>
      * <strong>note:</strong> requires at least Maven 3.3.1
@@ -192,25 +191,5 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
             sb.append(module);
         }
         return sb;
-    }
-
-    /**
-     * Convert a list into a string which is separated by the platform path separator.
-     *
-     * @param modulePaths the list of elements
-     * @return the string which contains the elements separated by {@link File#pathSeparatorChar}.
-     */
-    protected String getPlatformDependSeparateList(Collection<String> modulePaths) {
-        return String.join(Character.toString(File.pathSeparatorChar), modulePaths);
-    }
-
-    /**
-     * Convert a list of modules into a comma separated string.
-     *
-     * @param modules the list of modules
-     * @return the string with the module list which is separated by {@code ,}
-     */
-    protected String getCommaSeparatedList(Collection<String> modules) {
-        return String.join(",", modules);
     }
 }

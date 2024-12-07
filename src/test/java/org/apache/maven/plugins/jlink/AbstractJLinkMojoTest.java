@@ -38,8 +38,6 @@ package org.apache.maven.plugins.jlink;
  */
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,40 +88,5 @@ public class AbstractJLinkMojoTest {
     public void convertUsingMultipleDelimitersShouldReturnTwoCharactersSeparatedByPathSeparator() {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath("x:a::");
         assertThat(result).hasToString("x" + File.pathSeparatorChar + "a");
-    }
-
-    @Test
-    @DisplayName("getPlatformDependSeparateList() should return a single character")
-    public void getPlatformDependSeparateListShouldReturnASingleCharacter() {
-        String result = mojoMock.getPlatformDependSeparateList(Collections.singletonList("A"));
-        assertThat(result).isEqualTo("A");
-    }
-
-    @Test
-    @DisplayName("getPlatformDependSeparateList() should return two characters separated")
-    public void getPlatformDependSeparateListShouldReturnTwoCharactersSeparated() {
-        String result = mojoMock.getPlatformDependSeparateList(Arrays.asList("A", "B"));
-        assertThat(result).isEqualTo("A" + File.pathSeparatorChar + "B");
-    }
-
-    @Test
-    @DisplayName("getPlatformDependSeparateList() should return three characters separated")
-    public void getPlatformDependSeparateListShouldReturnThreeCharactersSeparated() {
-        String result = mojoMock.getPlatformDependSeparateList(Arrays.asList("A", "B", "C"));
-        assertThat(result).isEqualTo("A" + File.pathSeparatorChar + "B" + File.pathSeparatorChar + "C");
-    }
-
-    @Test
-    @DisplayName("getCommaSeparatedList() should return a single character")
-    public void getCommaSeparatedListShouldReturnASingleCharacter() {
-        String result = mojoMock.getCommaSeparatedList(Collections.singletonList("A"));
-        assertThat(result).isEqualTo("A");
-    }
-
-    @Test
-    @DisplayName("getCommaSeparatedList() should return two characters separated by comma")
-    public void getCommaSeparatedListShouldReturnTwoCharactersSeparatedByComma() {
-        String result = mojoMock.getCommaSeparatedList(Arrays.asList("A", "B"));
-        assertThat(result).isEqualTo("A,B");
     }
 }

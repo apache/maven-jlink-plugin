@@ -705,7 +705,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         if (pathsOfModules != null && !pathsOfModules.isEmpty()) {
             // @formatter:off
             jlinkArgs.add("--module-path");
-            jlinkArgs.add(getPlatformDependSeparateList(pathsOfModules).replace("\\", "\\\\"));
+            jlinkArgs.add(String.join(File.pathSeparator, pathsOfModules).replace("\\", "\\\\"));
             // @formatter:off
         }
 
@@ -719,7 +719,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         if (hasLimitModules()) {
             jlinkArgs.add("--limit-modules");
-            String sb = getCommaSeparatedList(limitModules);
+            String sb = String.join(",", limitModules);
             jlinkArgs.add(sb);
         }
 
@@ -727,7 +727,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add("--add-modules");
             // This must be name of the module and *NOT* the name of the
             // file! Can we somehow pre check this information to fail early?
-            String sb = getCommaSeparatedList(modulesToAdd);
+            String sb = String.join(",", modulesToAdd);
             jlinkArgs.add(sb.replace("\\", "\\\\"));
         }
 
@@ -735,7 +735,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add("--add-modules");
             jlinkArgs.add("jdk.localedata");
             jlinkArgs.add("--include-locales");
-            String sb = getCommaSeparatedList(includeLocales);
+            String sb = String.join(",", includeLocales);
             jlinkArgs.add(sb);
         }
 
@@ -757,7 +757,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         // NOTE: suggestProviders is a terminal JlinkTask, so must be at the end!
         if (hasSuggestProviders()) {
             jlinkArgs.add("--suggest-providers");
-            String sb = getCommaSeparatedList(suggestProviders);
+            String sb = String.join(",", suggestProviders);
             jlinkArgs.add(sb);
         }
 
