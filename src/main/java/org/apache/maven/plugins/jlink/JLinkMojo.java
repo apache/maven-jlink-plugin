@@ -242,7 +242,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * The byte order of the generated Java Run Time image. <code>--endian &lt;little|big&gt;</code>. If the endian is
      * not given the default is: <code>native</code>.
      */
-    // TODO: Should we define either little or big as default? or should we left as it.
+    // TODO: Should we define either little or big as default? or should we leave it as is?
     @Parameter
     private String endian;
 
@@ -272,14 +272,14 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private boolean ignoreSigningInformation;
 
     /**
-     * This will suppress to have an <code>includes</code> directory in the resulting Java Run Time Image. The JLink
+     * This will omit an <code>includes</code> directory from the resulting Java Run Time Image. The JLink
      * command line equivalent is: <code>--no-header-files</code>
      */
     @Parameter(defaultValue = "false")
     private boolean noHeaderFiles;
 
     /**
-     * This will suppress to have the <code>man</code> directory in the resulting Java Run Time Image. The JLink command
+     * This will omit the <code>man</code> directory from the resulting Java Run Time Image. The JLink command
      * line equivalent is: <code>--no-man-pages</code>
      */
     @Parameter(defaultValue = "false")
@@ -344,8 +344,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * Classifier to add to the artifact generated. If given, the artifact will be attached
      * as a supplemental artifact.
-     * If not given this will create the main artifact which is the default behavior.
-     * If you try to do that a second time without using a classifier the build will fail.
+     * If not given, this will create the main artifact which is the default behavior.
+     * If you try to do that a second time without using a classifier, the build will fail.
      */
     @Parameter
     private String classifier;
@@ -404,7 +404,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         ifOutputDirectoryExistsDelteIt();
 
-        JLinkExecutor jLinkExec = getExecutor();
+        JLinkExecutor jLinkExec = getJlinkExecutor();
         Collection<String> modulesToAdd = new ArrayList<>();
         if (addModules != null) {
             modulesToAdd.addAll(addModules);
@@ -547,10 +547,6 @@ public class JLinkMojo extends AbstractJLinkMojo {
         return modulepathElements;
     }
 
-    private JLinkExecutor getExecutor() {
-        return getJlinkExecutor();
-    }
-
     private boolean projectHasAlreadySetAnArtifact() {
         if (getProject().getArtifact().getFile() != null) {
             return getProject().getArtifact().getFile().isFile();
@@ -560,9 +556,9 @@ public class JLinkMojo extends AbstractJLinkMojo {
     }
 
     /**
-     * @return true in case where the classifier is not {@code null} and contains something else than white spaces.
+     * @return true when the classifier is not {@code null} and not empty
      */
-    protected boolean hasClassifier() {
+    private boolean hasClassifier() {
         boolean result = false;
         if (getClassifier() != null && !getClassifier().isEmpty()) {
             result = true;
@@ -581,7 +577,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
             zipArchiver.configureReproducible(lastModified);
         }
 
-        File resultArchive = getArchiveFile(outputDirectory, finalName, getClassifier(), "zip");
+        File resultArchive = getZipFile(outputDirectory, finalName, getClassifier());
 
         zipArchiver.setDestFile(resultArchive);
         try {
@@ -779,7 +775,41 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected String getClassifier() {
         return classifier;
+    }
+
+    /**
+     * Returns the archive file to generate, based on an optional classifier.
+     *
+     * @param basedir the output directory
+     * @param finalName the name of the zip file
+     * @param classifier an optional classifier
+     * @return the file to generate
+     */
+    private File getZipFile(File basedir, String finalName, String classifier) {
+        if (finalName.isEmpty()) {
+            throw new IllegalArgumentException("finalName is not allowed to be empty.");
+        }
+
+        StringBuilder fileName = new StringBuilder(finalName);
+
+        if (hasClassifier(classifier)) {
+            fileName.append("-").append(classifier);
+        }
+
+        fileName.append(".zip");
+
+        return new File(basedir, fileName.toString());
+    }
+
+    private boolean hasClassifier(String classifier) {
+        boolean result = false;
+        if (classifier != null && !classifier.isEmpty()) {
+            result = true;
+        }
+
+        return result;
     }
 }
