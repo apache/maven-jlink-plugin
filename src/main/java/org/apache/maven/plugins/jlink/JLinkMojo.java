@@ -41,10 +41,11 @@ import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -559,12 +560,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * @return true when the classifier is not {@code null} and not empty
      */
     private boolean hasClassifier() {
-        boolean result = false;
-        if (getClassifier() != null && !getClassifier().isEmpty()) {
-            result = true;
-        }
-
-        return result;
+        return hasClassifier(getClassifier());
     }
 
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
@@ -572,9 +568,9 @@ public class JLinkMojo extends AbstractJLinkMojo {
         zipArchiver.addDirectory(outputDirectoryImage);
 
         // configure for Reproducible Builds based on outputTimestamp value
-        Date lastModified = new MavenArchiver().parseOutputTimestamp(outputTimestamp);
-        if (lastModified != null) {
-            zipArchiver.configureReproducible(lastModified);
+        Optional<Instant> lastModified = MavenArchiver.parseBuildOutputTimestamp(outputTimestamp);
+        if (lastModified.isPresent()) {
+            zipArchiver.configureReproducibleBuild(FileTime.from(lastModified.get()));
         }
 
         File resultArchive = getZipFile(outputDirectory, finalName, getClassifier());
@@ -788,7 +784,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * @param classifier an optional classifier
      * @return the file to generate
      */
-    private File getZipFile(File basedir, String finalName, String classifier) {
+    private static File getZipFile(File basedir, String finalName, String classifier) {
         if (finalName.isEmpty()) {
             throw new IllegalArgumentException("finalName is not allowed to be empty.");
         }
@@ -804,7 +800,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         return new File(basedir, fileName.toString());
     }
 
-    private boolean hasClassifier(String classifier) {
+    private static boolean hasClassifier(String classifier) {
         boolean result = false;
         if (classifier != null && !classifier.isEmpty()) {
             result = true;
