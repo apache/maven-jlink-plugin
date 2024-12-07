@@ -369,7 +369,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private String outputTimestamp;
 
     /**
-     * These files are added to the image after calling the jlink, but before creating the zipfile.
+     * These files are added to the image after calling jlink, but before creating the zip file.
      *
      * @since 3.2.0
      */
@@ -492,8 +492,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
             Optional<Toolchain> toolchain = getToolchain();
             if (toolchain.isPresent()
                     && toolchain.orElseThrow(NoSuchElementException::new) instanceof DefaultJavaToolChain) {
-                Toolchain toolcahin1 = toolchain.orElseThrow(NoSuchElementException::new);
-                request.setJdkHome(new File(((DefaultJavaToolChain) toolcahin1).getJavaHome()));
+                Toolchain toolchain1 = toolchain.orElseThrow(NoSuchElementException::new);
+                request.setJdkHome(new File(((DefaultJavaToolChain) toolchain1).getJavaHome()));
             }
 
             ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths(request);
