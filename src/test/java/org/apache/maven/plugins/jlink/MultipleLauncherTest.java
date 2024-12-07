@@ -31,11 +31,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MultipleLauncherTest {
+
+    private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
+
     @Test
     void testSingleLauncher() throws Exception {
-        // It's OK to specify one launcher with "<launcher>"
-        // given
-        JLinkMojo mojo = new JLinkMojo();
+        // It's OK to specify one launcher with "<launcher>" given
         Field launcher = mojo.getClass().getDeclaredField("launcher");
         launcher.setAccessible(true);
         launcher.set(mojo, "l=com.example.Launch");
@@ -50,8 +51,6 @@ public class MultipleLauncherTest {
     @Test
     void testOneMultipleLauncher() throws Exception {
         // It's OK to specify one launcher with "<launchers>"
-        // given
-        JLinkMojo mojo = new JLinkMojo();
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
         launchers.set(mojo, List.of("l=com.example.Launch"));
@@ -66,11 +65,9 @@ public class MultipleLauncherTest {
     @Test
     void testMultipleLaunchers() throws Exception {
         // It's OK to specify multiple launchers with the "<launchers>" element
-        // given
-        JLinkMojo mojo = new JLinkMojo();
-        Field launcher = mojo.getClass().getDeclaredField("launchers");
-        launcher.setAccessible(true);
-        launcher.set(mojo, List.of("l1=com.example.Launch1", "l2=com.example.Launch2"));
+        Field launchers = mojo.getClass().getDeclaredField("launchers");
+        launchers.setAccessible(true);
+        launchers.set(mojo, List.of("l1=com.example.Launch1", "l2=com.example.Launch2"));
 
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
@@ -82,8 +79,6 @@ public class MultipleLauncherTest {
     @Test
     void testInvalidLauncherConfig() throws Exception {
         // It's an error to specify both "<launcher>" and "<launchers>"
-        // given
-        JLinkMojo mojo = new JLinkMojo();
         Field launcher = mojo.getClass().getDeclaredField("launcher");
         launcher.setAccessible(true);
         launcher.set(mojo, "l3=com.example.Launch3");

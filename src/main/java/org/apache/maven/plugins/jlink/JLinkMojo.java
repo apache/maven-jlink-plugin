@@ -37,6 +37,8 @@ package org.apache.maven.plugins.jlink;
  * under the License.
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.apache.maven.shared.filtering.MavenResourcesExecution;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.maven.toolchain.Toolchain;
+import org.apache.maven.toolchain.ToolchainManager;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.codehaus.plexus.archiver.Archiver;
@@ -89,8 +92,6 @@ import static java.util.Collections.singletonMap;
  */
 @Mojo(name = "jlink", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PACKAGE)
 public class JLinkMojo extends AbstractJLinkMojo {
-    @Component
-    private LocationManager locationManager;
 
     /**
      * <p>
@@ -367,21 +368,33 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private String outputTimestamp;
 
     /**
-     * Convenience interface for plugins to add or replace artifacts and resources on projects.
-     */
-    @Component
-    private MavenProjectHelper projectHelper;
-
-    /**
-     * These file are added to the image after calling the jlink, but before creating the zipfile.
+     * These files are added to the image after calling the jlink, but before creating the zipfile.
      *
      * @since 3.2.0
      */
     @Parameter
     private List<Resource> additionalResources;
 
-    @Component(role = MavenResourcesFiltering.class, hint = "default")
-    private MavenResourcesFiltering mavenResourcesFiltering;
+    /**
+     * Convenience interface for plugins to add or replace artifacts and resources on projects.
+     */
+    private final MavenProjectHelper projectHelper;
+
+    private final MavenResourcesFiltering mavenResourcesFiltering;
+
+    private final LocationManager locationManager;
+
+    @Inject
+    public JLinkMojo(
+            MavenProjectHelper projectHelper,
+            ToolchainManager toolchainManager,
+            MavenResourcesFiltering mavenResourcesFiltering,
+            LocationManager locationManager) {
+        super(toolchainManager);
+        this.mavenResourcesFiltering = mavenResourcesFiltering;
+        this.projectHelper = projectHelper;
+        this.locationManager = locationManager;
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
