@@ -196,16 +196,15 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
     }
 
     private static boolean isOSWindows() {
-        String osName;
         try {
-            osName = System.getProperty("os.name");
+            String osName = System.getProperty("os.name");
+            if (osName == null) {
+                return false;
+            }
+            return osName.startsWith("Windows");
         } catch (final SecurityException ex) {
             // we are not allowed to look at this property
             return false;
         }
-        if (osName == null) {
-            return false;
-        }
-        return osName.startsWith("Windows");
     }
 }
