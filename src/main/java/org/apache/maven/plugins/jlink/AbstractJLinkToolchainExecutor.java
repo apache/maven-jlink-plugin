@@ -158,8 +158,8 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
         try {
             int exitCode = CommandLineUtils.executeCommandLine(cmd, out, err);
 
-            String output =
-                    out.getOutput().isBlank() ? null : '\n' + out.getOutput().trim();
+            String output = out.getOutput().trim();
+            output = output.isEmpty() ? null : '\n' + output;
 
             if (exitCode != 0) {
 
@@ -173,7 +173,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
 
                 StringBuilder msg = new StringBuilder("\nExit code: ");
                 msg.append(exitCode);
-                if (!err.getOutput().isBlank()) {
+                if (!err.getOutput().trim().isEmpty()) {
                     msg.append(" - ").append(err.getOutput());
                 }
                 msg.append('\n');
