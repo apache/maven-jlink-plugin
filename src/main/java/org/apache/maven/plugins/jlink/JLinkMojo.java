@@ -38,6 +38,7 @@ package org.apache.maven.plugins.jlink;
  */
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -73,7 +73,6 @@ import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.apache.maven.toolchain.ToolchainPrivate;
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
-import org.codehaus.plexus.archiver.Archiver;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
@@ -331,12 +330,6 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private boolean verbose;
 
     /**
-     * The JAR archiver needed for archiving the environments.
-     */
-    @Component(role = Archiver.class, hint = "zip")
-    private ZipArchiver zipArchiver;
-
-    /**
      * Set the JDK location to create a Java custom runtime image.
      */
     @Parameter
@@ -385,13 +378,20 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     private final LocationManager locationManager;
 
+    /**
+     * The JAR archiver needed for archiving the environments.
+     */
+    private final ZipArchiver zipArchiver;
+
     @Inject
     public JLinkMojo(
             MavenProjectHelper projectHelper,
             ToolchainManager toolchainManager,
+            @Named("zip") ZipArchiver zipArchiver,
             MavenResourcesFiltering mavenResourcesFiltering,
             LocationManager locationManager) {
         super(toolchainManager);
+        this.zipArchiver = zipArchiver;
         this.mavenResourcesFiltering = mavenResourcesFiltering;
         this.projectHelper = projectHelper;
         this.locationManager = locationManager;
