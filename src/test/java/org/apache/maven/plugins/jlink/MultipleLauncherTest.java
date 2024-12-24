@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MultipleLauncherTest {
 
-    private JLinkMojo mojo = new JLinkMojo(null, null, null, null, null);
+    private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
 
     @Test
     void testSingleLauncher() throws Exception {

@@ -38,7 +38,6 @@ package org.apache.maven.plugins.jlink;
  */
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -381,17 +380,15 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * The JAR archiver needed for archiving the environments.
      */
-    private final ZipArchiver zipArchiver;
+    private final ZipArchiver zipArchiver = new ZipArchiver();
 
     @Inject
     public JLinkMojo(
             MavenProjectHelper projectHelper,
             ToolchainManager toolchainManager,
-            @Named("zip") ZipArchiver zipArchiver,
             MavenResourcesFiltering mavenResourcesFiltering,
             LocationManager locationManager) {
         super(toolchainManager);
-        this.zipArchiver = zipArchiver;
         this.mavenResourcesFiltering = mavenResourcesFiltering;
         this.projectHelper = projectHelper;
         this.locationManager = locationManager;
