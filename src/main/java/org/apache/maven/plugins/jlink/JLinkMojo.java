@@ -369,6 +369,14 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<Resource> additionalResources;
 
     /**
+     * Add prefix to all of zip entries. It would be treated as a directory if the prefix ends with "/".
+     *
+     * @since 3.2.1
+     */
+    @Parameter(defaultValue = "")
+    private String zipDirPrefix;
+
+    /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
     private final MavenProjectHelper projectHelper;
@@ -562,7 +570,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
             throws MojoExecutionException {
-        zipArchiver.addDirectory(outputDirectoryImage);
+        zipArchiver.addDirectory(outputDirectoryImage, zipDirPrefix);
 
         // configure for Reproducible Builds based on outputTimestamp value
         Optional<Instant> lastModified = MavenArchiver.parseBuildOutputTimestamp(outputTimestamp);
