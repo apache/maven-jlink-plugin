@@ -1,3 +1,4 @@
+package com.corporate.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -18,11 +19,10 @@
  * under the License.
  */
 
-def base = basedir.toString() + '/target'
-
-def unzip = ['unzip', '-d', base, base + '/maven-jlink-plugin-gh502-42.0.0.zip'].execute()
-unzip.waitFor()
-
-def test = (base + '/prefix-test/bin/helloworld').execute()
-test.waitFor()
-assert test.text.trim() == 'Hello World'
+public class HelloWorld
+{
+  public static void main( String[] args )
+  {
+    System.out.println("Hello World");
+  }
+}
