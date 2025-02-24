@@ -369,7 +369,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<Resource> additionalResources;
 
     /**
-     * Add prefix to all of zip entries. It would be treated as a directory if the prefix ends with "/".
+     * Add directory prefix to all of zip entries in top level files/directories.
+     *
+     * <p>For example, if this value is set to <code>prefix</code>,
+     * <code>bin/launcher</code> is transformed to <code>prefix/bin/launcher</code>.</p>
+     *
+     * <p>Empty String is set by default. It means no prefix.</p>
      *
      * @since 3.2.1
      */
@@ -570,6 +575,9 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
             throws MojoExecutionException {
+        if (zipDirPrefix != null && !zipDirPrefix.isEmpty() && !zipDirPrefix.endsWith("/")) {
+            zipDirPrefix += "/";
+        }
         zipArchiver.addDirectory(outputDirectoryImage, zipDirPrefix);
 
         // configure for Reproducible Builds based on outputTimestamp value

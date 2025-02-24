@@ -39,10 +39,7 @@
         <version>@project.version@</version>
         <extensions>true</extensions>
         <configuration>
-          <addModules>
-            <module>java.base</module>
-          </addModules>
-          <zipDirPrefix>prefix-test/</zipDirPrefix>
+          <zipDirPrefix>prefix-test</zipDirPrefix>
           <launcher>helloworld=com.corporate.project/com.corporate.project.HelloWorld</launcher>
         </configuration>
       </plugin>
