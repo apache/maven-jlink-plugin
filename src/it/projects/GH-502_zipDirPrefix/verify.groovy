@@ -18,11 +18,18 @@
  * under the License.
  */
 
+def isWindows = System.getProperty('os.name').startsWith('Windows')
 def base = basedir.toString() + '/target'
+def archive = base + '/maven-jlink-plugin-gh502-42.0.0.zip'
+def unzipCommand = isWindows
+                     ? ['powershell.exe', 'Expand-Archive', '-Path', archive, '-DestinationPath', base]
+                     : ['unzip', '-d', base, archive]
+unzipCommand.execute().waitFor()
 
-def unzip = ['unzip', '-d', base, base + '/maven-jlink-plugin-gh502-42.0.0.zip'].execute()
-unzip.waitFor()
-
-def test = (base + '/prefix-test/bin/helloworld').execute()
-test.waitFor()
-assert test.text.trim() == 'Hello World'
+def testCommand = base + '/prefix-test/bin/helloworld'
+if (isWindows) {
+  testCommand += '.bat'
+}
+def testProc = testCommand.execute()
+testProc.waitFor()
+assert testProc.text.trim() == 'Hello World'
