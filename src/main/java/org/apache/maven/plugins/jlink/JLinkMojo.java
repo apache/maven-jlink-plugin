@@ -464,12 +464,16 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
     }
 
-    private List<File> getCompileClasspathElements(MavenProject project) {
+    List<File> getCompileClasspathElements(MavenProject project) {
         List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
 
         for (Artifact a : project.getArtifacts()) {
-            getLog().debug("Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion());
-            list.add(a.getFile());
+            boolean skip = "pom".equals(a.getType());
+            getLog().debug("Adding artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()
+                    + (skip ? " (skipping)" : ""));
+            if (!skip) {
+                list.add(a.getFile());
+            }
         }
         return list;
     }
