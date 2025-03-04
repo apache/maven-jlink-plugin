@@ -21,15 +21,20 @@ package org.apache.maven.plugins.jlink;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 public class JLinkMojoTest {
 
@@ -76,5 +81,25 @@ public class JLinkMojoTest {
         assertThat(cmdLine.toString())
                 .contains(
                         "\\path\\to\\jlink \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink");
+    }
+
+    @Test
+    void getCompileClasspathElements() throws Exception {
+        // Given
+        MavenProject project = Mockito.mock(MavenProject.class);
+
+        Artifact pomArtifact = Mockito.mock(Artifact.class);
+        when(pomArtifact.getType()).thenReturn("pom");
+
+        Artifact jarArtifact = Mockito.mock(Artifact.class);
+        when(jarArtifact.getType()).thenReturn("jar");
+        when(jarArtifact.getFile()).thenReturn(new File("some.jar"));
+
+        when(project.getArtifacts()).thenReturn(Set.of(pomArtifact, jarArtifact));
+
+        List<File> classpathElements = mojo.getCompileClasspathElements(project);
+
+        // Then
+        assertThat(classpathElements).containsExactly(new File("some.jar"));
     }
 }
