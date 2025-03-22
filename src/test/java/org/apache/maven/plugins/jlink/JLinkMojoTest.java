@@ -43,7 +43,7 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void double_quote_every_argument() throws Exception {
+    void doubleQuoteEveryArgument() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
 
@@ -53,7 +53,7 @@ public class JLinkMojoTest {
 
     @DisabledOnOs(OS.WINDOWS)
     @Test
-    void single_quotes_shell_command_unix() throws Exception {
+    void singleQuotesShellCommandUnix() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
@@ -66,7 +66,7 @@ public class JLinkMojoTest {
 
     @EnabledOnOs(OS.WINDOWS)
     @Test
-    void single_quotes_shell_command_windows() throws Exception {
+    void singleQuotesShellCommandWindows() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
