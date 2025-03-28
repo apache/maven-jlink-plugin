@@ -330,6 +330,13 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private boolean generateCdsArchive;
 
     /**
+     * This will order the specified paths in priority order.
+     * The JLink command line equivalent is: <code>--order-resources &lt;path&gt;[,&lt;path&gt;...]</code>
+     */
+    @Parameter
+    private List<String> orderResources;
+
+    /**
      * This will turn on verbose mode. The jlink command line equivalent is: <code>--verbose</code>
      */
     @Parameter(defaultValue = "false")
@@ -736,6 +743,11 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         if (generateCdsArchive) {
             jlinkArgs.add("--generate-cds-archive");
+        }
+
+        if (orderResources != null && !orderResources.isEmpty()) {
+            String sb = String.join(",", orderResources);
+            jlinkArgs.add("--order-resources=" + sb);
         }
 
         if (pluginModulePath != null) {
