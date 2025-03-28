@@ -323,6 +323,13 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<String> includeLocales;
 
     /**
+     * This will generate a CDS archive if the runtime image supports it.
+     * The JLink command line equivalent is: <code>--generate-cds-archive</code>
+     */
+    @Parameter(defaultValue = "false")
+    private boolean generateCdsArchive;
+
+    /**
      * This will turn on verbose mode. The jlink command line equivalent is: <code>--verbose</code>
      */
     @Parameter(defaultValue = "false")
@@ -725,6 +732,10 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add("--include-locales");
             String sb = String.join(",", includeLocales);
             jlinkArgs.add(sb);
+        }
+
+        if (generateCdsArchive) {
+            jlinkArgs.add("--generate-cds-archive");
         }
 
         if (pluginModulePath != null) {
