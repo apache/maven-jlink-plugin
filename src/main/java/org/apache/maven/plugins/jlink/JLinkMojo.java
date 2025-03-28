@@ -383,6 +383,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<Resource> additionalResources;
 
     /**
+     * These arguments are additionally passed to the jlink command line.
+     */
+    @Parameter
+    private List<String> additionalArgs;
+
+    /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
     private final MavenProjectHelper projectHelper;
@@ -763,6 +769,10 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         if (verbose) {
             jlinkArgs.add("--verbose");
+        }
+
+        if (additionalArgs != null && !additionalArgs.isEmpty()) {
+            jlinkArgs.addAll(additionalArgs);
         }
 
         // NOTE: suggestProviders is a terminal JlinkTask, so must be at the end!
