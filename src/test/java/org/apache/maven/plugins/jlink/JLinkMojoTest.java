@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,22 +87,37 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void getCompileClasspathElements() throws Exception {
+    void getCompileClasspathElements_shouldSkipPomTypeArtifacts() throws Exception {
         // Given
         MavenProject project = Mockito.mock(MavenProject.class);
 
-        Artifact pomArtifact = Mockito.mock(Artifact.class);
-        when(pomArtifact.getType()).thenReturn("pom");
+        Artifact pomArtifact = new DefaultArtifact(
+                "group",
+                "artifact-pom",
+                VersionRange.createFromVersion("1.0"),
+                "compile",
+                "pom",
+                null,
+                new DefaultArtifactHandler("pom"));
 
-        Artifact jarArtifact = Mockito.mock(Artifact.class);
-        when(jarArtifact.getType()).thenReturn("jar");
-        when(jarArtifact.getFile()).thenReturn(new File("some.jar"));
+        Artifact jarArtifact = new DefaultArtifact(
+                "group",
+                "artifact-jar",
+                VersionRange.createFromVersion("1.0"),
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("jar"));
+
+        File jarFile = new File("some.jar");
+        jarArtifact.setFile(jarFile);
 
         when(project.getArtifacts()).thenReturn(Set.of(pomArtifact, jarArtifact));
 
+        // When
         List<File> classpathElements = mojo.getCompileClasspathElements(project);
 
         // Then
-        assertThat(classpathElements).containsExactly(new File("some.jar"));
+        assertThat(classpathElements).containsExactly(jarFile).doesNotContainNull();
     }
 }
