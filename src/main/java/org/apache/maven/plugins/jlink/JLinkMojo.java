@@ -464,18 +464,35 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
     }
 
+    /**
+     * Gets the compile classpath elements while filtering out artifacts that should be skipped.
+     *
+     * @param project The Maven project
+     * @return List of files that should be included in the classpath
+     */
     List<File> getCompileClasspathElements(MavenProject project) {
         List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
 
-        for (Artifact a : project.getArtifacts()) {
-            boolean skip = "pom".equals(a.getType());
-            getLog().debug("Adding artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion()
-                    + (skip ? " (skipping)" : ""));
-            if (!skip) {
-                list.add(a.getFile());
+        for (Artifact artifact : project.getArtifacts()) {
+            boolean shouldSkip = shouldSkip(artifact);
+            getLog().debug("Adding artifact: " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+                    + artifact.getVersion() + (shouldSkip ? " (skipping)" : ""));
+            if (!shouldSkip) {
+                list.add(artifact.getFile());
             }
         }
         return list;
+    }
+
+    /**
+     * Determines if an artifact should be skipped based on its properties.
+     * Currently, skips POM type artifacts, but can be extended for other cases.
+     *
+     * @param artifact The artifact to check
+     * @return true if the artifact should be skipped, false otherwise
+     */
+    private boolean shouldSkip(Artifact artifact) {
+        return "pom".equals(artifact.getType());
     }
 
     private Map<String, File> getModulePathElements() throws MojoFailureException {
