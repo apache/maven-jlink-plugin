@@ -264,6 +264,8 @@
                   ! and how the work.
                 -->
                 <pomExclude>cli-options/suggest-providers/pom.xml</pomExclude>
+                <!-- This test does not work for all jdk vendors and versions -->
+                <pomExclude>cli-options/generate-cds-archive/pom.xml</pomExclude>
               </pomExcludes>
               <settingsFile>src/it/mrm/settings.xml</settingsFile>
               <filterProperties>
