@@ -87,7 +87,7 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void getCompileClasspathElements_shouldSkipPomTypeArtifacts() throws Exception {
+    void getCompileClasspathElementsShouldSkipPomTypeArtifacts() throws Exception {
         // Given
         MavenProject project = Mockito.mock(MavenProject.class);
 
