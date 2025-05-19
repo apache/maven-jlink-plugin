@@ -25,10 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.filtering.MavenResourcesFiltering;
+import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.utils.cli.Commandline;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
@@ -40,12 +45,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import org.mockito.Mockito;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 public class JLinkMojoTest {
@@ -74,7 +82,7 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void double_quote_every_argument() throws Exception {
+    void doubleQuoteEveryArgument() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of(), List.of());
 
@@ -84,7 +92,7 @@ public class JLinkMojoTest {
 
     @DisabledOnOs(OS.WINDOWS)
     @Test
-    void single_quotes_shell_command_unix() throws Exception {
+    void singleQuotesShellCommandUnix() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
@@ -97,7 +105,7 @@ public class JLinkMojoTest {
 
     @EnabledOnOs(OS.WINDOWS)
     @Test
-    void single_quotes_shell_command_windows() throws Exception {
+    void singleQuotesShellCommandWindows() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
         Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
@@ -187,5 +195,38 @@ public class JLinkMojoTest {
         assertThat(modulePathElements).hasSize(1);
         assertThat(modulePathElements).containsKey("valid.module");
         assertThat(modulePathElements).doesNotContainKey("automatic.module");
+
+    void getCompileClasspathElementsShouldSkipPomTypeArtifacts() throws Exception {
+        // Given
+        MavenProject project = Mockito.mock(MavenProject.class);
+
+        Artifact pomArtifact = new DefaultArtifact(
+                "group",
+                "artifact-pom",
+                VersionRange.createFromVersion("1.0"),
+                "compile",
+                "pom",
+                null,
+                new DefaultArtifactHandler("pom"));
+
+        Artifact jarArtifact = new DefaultArtifact(
+                "group",
+                "artifact-jar",
+                VersionRange.createFromVersion("1.0"),
+                "compile",
+                "jar",
+                null,
+                new DefaultArtifactHandler("jar"));
+
+        File jarFile = new File("some.jar");
+        jarArtifact.setFile(jarFile);
+
+        when(project.getArtifacts()).thenReturn(Set.of(pomArtifact, jarArtifact));
+
+        // When
+        List<File> classpathElements = mojo.getCompileClasspathElements(project);
+
+        // Then
+        assertThat(classpathElements).containsExactly(jarFile).doesNotContainNull();
     }
 }
