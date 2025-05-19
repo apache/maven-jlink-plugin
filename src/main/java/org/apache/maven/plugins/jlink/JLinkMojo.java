@@ -495,7 +495,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
         return "pom".equals(artifact.getType());
     }
 
-    private Map<String, File> getModulePathElements() throws MojoFailureException {
+    Map<String, File> getModulePathElements() throws MojoFailureException {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
         // and we can detect if auto modules are used. In that case, MavenProject.setFile() should not be used, so
         // you cannot depend on this project and so it won't be distributed.
@@ -526,8 +526,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
                     throw new MojoFailureException(message);
                 }
 
-                // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug(" module: " + descriptor.name() + " automatic: " + descriptor.isAutomatic());
+                // Filter out automatic modules
+                if (descriptor.isAutomatic()) {
+                    getLog().debug("Ignoring automatic module: " + descriptor.name());
+                    continue;
+                }
+
                 if (modulepathElements.containsKey(descriptor.name())) {
                     getLog().warn("The module name " + descriptor.name() + " does already exists.");
                 }
@@ -551,6 +555,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
                         getLog().error(message);
                         throw new MojoFailureException(message);
                     }
+
+                    if (descriptor.isAutomatic()) {
+                        getLog().debug("Ignoring automatic module: " + descriptor.name());
+                        continue;
+                    }
+
                     if (modulepathElements.containsKey(descriptor.name())) {
                         getLog().warn("The module name " + descriptor.name() + " does already exists.");
                     }
