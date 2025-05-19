@@ -484,8 +484,6 @@ public class JLinkMojo extends AbstractJLinkMojo {
         return list;
     }
 
-    Map<String, File> getModulePathElements() throws MojoFailureException {
-      
     /**
      * Determines if an artifact should be skipped based on its properties.
      * Currently, skips POM type artifacts, but can be extended for other cases.
