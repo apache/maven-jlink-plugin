@@ -32,6 +32,8 @@ github:
     - MJLINK
   features:
     issues: true
+  protected_branches:
+    master: {}
 notifications:
   commits: commits@maven.apache.org
   issues: issues@maven.apache.org
