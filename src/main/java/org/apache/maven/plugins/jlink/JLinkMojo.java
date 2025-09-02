@@ -484,17 +484,38 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
     }
 
-    private List<File> getCompileClasspathElements(MavenProject project) {
+    /**
+     * Gets the compile classpath elements while filtering out artifacts that should be skipped.
+     *
+     * @param project The Maven project
+     * @return List of files that should be included in the classpath
+     */
+    List<File> getCompileClasspathElements(MavenProject project) {
         List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
 
-        for (Artifact a : project.getArtifacts()) {
-            getLog().debug("Artifact: " + a.getGroupId() + ":" + a.getArtifactId() + ":" + a.getVersion());
-            list.add(a.getFile());
+        for (Artifact artifact : project.getArtifacts()) {
+            boolean shouldSkip = shouldSkip(artifact);
+            getLog().debug("Adding artifact: " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":"
+                    + artifact.getVersion() + (shouldSkip ? " (skipping)" : ""));
+            if (!shouldSkip) {
+                list.add(artifact.getFile());
+            }
         }
         return list;
     }
 
-    private Map<String, File> getModulePathElements() throws MojoFailureException {
+    /**
+     * Determines if an artifact should be skipped based on its properties.
+     * Currently, skips POM type artifacts, but can be extended for other cases.
+     *
+     * @param artifact The artifact to check
+     * @return true if the artifact should be skipped, false otherwise
+     */
+    private boolean shouldSkip(Artifact artifact) {
+        return "pom".equals(artifact.getType());
+    }
+
+    Map<String, File> getModulePathElements() throws MojoFailureException {
         // For now only allow named modules. Once we can create a graph with ASM we can specify exactly the modules
         // and we can detect if auto modules are used. In that case, MavenProject.setFile() should not be used, so
         // you cannot depend on this project and so it won't be distributed.
@@ -525,8 +546,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
                     throw new MojoFailureException(message);
                 }
 
-                // Don't warn for automatic modules, let the jlink tool do that
-                getLog().debug(" module: " + descriptor.name() + " automatic: " + descriptor.isAutomatic());
+                // Filter out automatic modules
+                if (descriptor.isAutomatic()) {
+                    getLog().debug("Ignoring automatic module: " + descriptor.name());
+                    continue;
+                }
+
                 if (modulepathElements.containsKey(descriptor.name())) {
                     getLog().warn("The module name " + descriptor.name() + " does already exists.");
                 }
@@ -550,6 +575,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
                         getLog().error(message);
                         throw new MojoFailureException(message);
                     }
+
+                    if (descriptor.isAutomatic()) {
+                        getLog().debug("Ignoring automatic module: " + descriptor.name());
+                        continue;
+                    }
+
                     if (modulepathElements.containsKey(descriptor.name())) {
                         getLog().warn("The module name " + descriptor.name() + " does already exists.");
                     }

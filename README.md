@@ -23,7 +23,6 @@ Contributing to [Apache Maven JLink Plugin](https://maven.apache.org/plugins/mav
 [![Jenkins Status](https://img.shields.io/jenkins/s/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven-jlink-plugin/job/master.svg?)][build]
 [![Jenkins tests](https://img.shields.io/jenkins/t/https/ci-maven.apache.org/job/Maven/job/maven-box/job/maven-jlink-plugin/job/master.svg?)][test-results]
 
-
 You have found a bug or you have an idea for a cool new feature? Contributing
 code is a great way to give something back to the open source community. Before
 you dig right into the code, there are a few guidelines that we need
