@@ -59,7 +59,7 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
      * Specify the requirements for this JDK toolchain. This overrules the toolchain selected by the
      * maven-toolchain-plugin.
      * </p>
-     * <strong>note:</strong> requires at least Maven 3.3.1
+     * <strong>note:</strong> requires at least Maven 3.3.1.
      */
     @Parameter
     private Map<String, String> jdkToolchain;
@@ -78,7 +78,8 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
 
     /**
      * Overload this to produce a zip with another classifier, for example a jlink-zip.
-     * @return get the classifier.
+     *
+     * @return get the classifier
      */
     protected abstract String getClassifier();
 

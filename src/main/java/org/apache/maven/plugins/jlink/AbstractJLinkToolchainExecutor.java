@@ -65,7 +65,7 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
     /**
      * Execute JLink via toolchain.
      *
-     * @return the exit code ({@code 0} on success).
+     * @return the exit code ({@code 0} on success)
      */
     @Override
     public int executeJlink(List<String> jlinkArgs) throws MojoExecutionException {

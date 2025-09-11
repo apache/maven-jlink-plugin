@@ -97,7 +97,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * Specify the requirements for this jdk toolchain. This overrules the toolchain selected by the
      * maven-toolchain-plugin.
      * </p>
-     * <strong>note:</strong> requires at least Maven 3.3.1
+     * <strong>note:</strong> requires at least Maven 3.3.1.
      */
     @Parameter
     private Map<String, String> jdkToolchain;
@@ -467,8 +467,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * Gets the compile classpath elements while filtering out artifacts that should be skipped.
      *
-     * @param project The Maven project
-     * @return List of files that should be included in the classpath
+     * @param project the Maven project
+     * @return list of files that should be included in the classpath
      */
     List<File> getCompileClasspathElements(MavenProject project) {
         List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
@@ -488,7 +488,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * Determines if an artifact should be skipped based on its properties.
      * Currently, skips POM type artifacts, but can be extended for other cases.
      *
-     * @param artifact The artifact to check
+     * @param artifact the artifact to check
      * @return true if the artifact should be skipped, false otherwise
      */
     private boolean shouldSkip(Artifact artifact) {
