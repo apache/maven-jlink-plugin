@@ -369,6 +369,19 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<Resource> additionalResources;
 
     /**
+     * Add directory prefix to all of zip entries in top level files/directories.
+     *
+     * <p>For example, if this value is set to <code>prefix</code>,
+     * <code>bin/launcher</code> is transformed to <code>prefix/bin/launcher</code>.</p>
+     *
+     * <p>Empty String is set by default. It means no prefix.</p>
+     *
+     * @since 3.2.1
+     */
+    @Parameter(defaultValue = "")
+    private String zipDirPrefix;
+
+    /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
      */
     private final MavenProjectHelper projectHelper;
@@ -593,7 +606,10 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
             throws MojoExecutionException {
-        zipArchiver.addDirectory(outputDirectoryImage);
+        if (zipDirPrefix != null && !zipDirPrefix.isEmpty() && !zipDirPrefix.endsWith("/")) {
+            zipDirPrefix += "/";
+        }
+        zipArchiver.addDirectory(outputDirectoryImage, zipDirPrefix);
 
         // configure for Reproducible Builds based on outputTimestamp value
         Optional<Instant> lastModified = MavenArchiver.parseBuildOutputTimestamp(outputTimestamp);
