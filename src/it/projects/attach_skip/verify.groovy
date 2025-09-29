@@ -23,8 +23,7 @@ import java.util.*;
 import java.util.jar.*;
 import org.codehaus.plexus.util.*;
 
-try
-{
+try {
     File target = new File( basedir, "target" )
     if ( !target.exists() || !target.isDirectory() ) {
         System.err.println( "target file is missing or not a directory." )
@@ -87,9 +86,7 @@ try
     }
 
     return true
-}
-catch( Throwable e )
-{
+} catch( Throwable e ) {
     e.printStackTrace()
     return false
 }
