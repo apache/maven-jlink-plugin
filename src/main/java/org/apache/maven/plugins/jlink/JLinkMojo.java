@@ -474,17 +474,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         File createZipArchiveFromImage = createZipArchiveFromImage(buildDirectory, outputDirectoryImage);
 
-        if (attach) {
-            if (hasClassifier()) {
-                projectHelper.attachArtifact(getProject(), "jlink", getClassifier(), createZipArchiveFromImage);
-            } else {
-                if (projectHasAlreadySetAnArtifact()) {
-                    throw new MojoExecutionException("You have to use a classifier "
-                            + "to attach supplemental artifacts to the project instead of replacing them.");
-                }
-                getProject().getArtifact().setFile(createZipArchiveFromImage);
-            }
-        }
+        attachArtifactUnlessDisabled(createZipArchiveFromImage);
     }
 
     /**
@@ -638,6 +628,22 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
 
         return resultArchive;
+    }
+
+    private void attachArtifactUnlessDisabled(File artifactFile) throws MojoExecutionException {
+        if (!attach) {
+            return;
+        }
+
+        if (hasClassifier()) {
+            projectHelper.attachArtifact(getProject(), "jlink", getClassifier(), artifactFile);
+        } else {
+            if (projectHasAlreadySetAnArtifact()) {
+                throw new MojoExecutionException("You have to use a classifier "
+                        + "to attach supplemental artifacts to the project instead of replacing them.");
+            }
+            getProject().getArtifact().setFile(artifactFile);
+        }
     }
 
     private void failIfParametersAreNotInTheirValidValueRanges() throws MojoFailureException {
