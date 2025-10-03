@@ -336,7 +336,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     /**
      * Controls whether the plugin tries to attach the resulting artifact to the project.
-     * 
+     *
      * @since 3.2.1
      */
     @Parameter(defaultValue = "true")
