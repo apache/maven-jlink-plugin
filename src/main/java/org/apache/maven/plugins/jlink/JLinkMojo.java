@@ -97,7 +97,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * Specify the requirements for this jdk toolchain. This overrules the toolchain selected by the
      * maven-toolchain-plugin.
      * </p>
-     * <strong>note:</strong> requires at least Maven 3.3.1
+     * <strong>note:</strong> requires at least Maven 3.3.1.
      */
     @Parameter
     private Map<String, String> jdkToolchain;
@@ -383,6 +383,19 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<Resource> additionalResources;
 
     /**
+     * Add directory prefix to all of zip entries in top level files/directories.
+     *
+     * <p>For example, if this value is set to <code>prefix</code>,
+     * <code>bin/launcher</code> is transformed to <code>prefix/bin/launcher</code>.</p>
+     *
+     * <p>Empty String is set by default. It means no prefix.</p>
+     *
+     * @since 3.2.1
+     */
+    @Parameter(defaultValue = "")
+    private String zipDirPrefix;
+
+    /**
      * These arguments are additionally passed to the jlink command line.
      */
     @Parameter
@@ -487,8 +500,8 @@ public class JLinkMojo extends AbstractJLinkMojo {
     /**
      * Gets the compile classpath elements while filtering out artifacts that should be skipped.
      *
-     * @param project The Maven project
-     * @return List of files that should be included in the classpath
+     * @param project the Maven project
+     * @return list of files that should be included in the classpath
      */
     List<File> getCompileClasspathElements(MavenProject project) {
         List<File> list = new ArrayList<>(project.getArtifacts().size() + 1);
@@ -508,7 +521,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
      * Determines if an artifact should be skipped based on its properties.
      * Currently, skips POM type artifacts, but can be extended for other cases.
      *
-     * @param artifact The artifact to check
+     * @param artifact the artifact to check
      * @return true if the artifact should be skipped, false otherwise
      */
     private boolean shouldSkip(Artifact artifact) {
@@ -613,7 +626,10 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
     private File createZipArchiveFromImage(File outputDirectory, File outputDirectoryImage)
             throws MojoExecutionException {
-        zipArchiver.addDirectory(outputDirectoryImage);
+        if (zipDirPrefix != null && !zipDirPrefix.isEmpty() && !zipDirPrefix.endsWith("/")) {
+            zipDirPrefix += "/";
+        }
+        zipArchiver.addDirectory(outputDirectoryImage, zipDirPrefix);
 
         // configure for Reproducible Builds based on outputTimestamp value
         Optional<Instant> lastModified = MavenArchiver.parseBuildOutputTimestamp(outputTimestamp);

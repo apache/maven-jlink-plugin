@@ -110,12 +110,12 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-archiver</artifactId>
-      <version>3.6.4</version>
+      <version>3.6.5</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-archiver</artifactId>
-      <version>4.10.1</version>
+      <version>4.10.3</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -159,7 +159,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.27.4</version>
+      <version>3.27.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -210,6 +210,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
+        <version>3.9.1</version>
       </plugin>
     </plugins>
   </reporting>
