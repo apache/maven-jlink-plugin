@@ -323,6 +323,20 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private List<String> includeLocales;
 
     /**
+     * This will generate a CDS archive if the runtime image supports it.
+     * The JLink command line equivalent is: <code>--generate-cds-archive</code>
+     */
+    @Parameter(defaultValue = "false")
+    private boolean generateCdsArchive;
+
+    /**
+     * This will order the specified paths in priority order.
+     * The JLink command line equivalent is: <code>--order-resources &lt;path&gt;[,&lt;path&gt;...]</code>
+     */
+    @Parameter
+    private List<String> orderResources;
+
+    /**
      * This will turn on verbose mode. The jlink command line equivalent is: <code>--verbose</code>
      */
     @Parameter(defaultValue = "false")
@@ -380,6 +394,12 @@ public class JLinkMojo extends AbstractJLinkMojo {
      */
     @Parameter(defaultValue = "")
     private String zipDirPrefix;
+
+    /**
+     * These arguments are additionally passed to the jlink command line.
+     */
+    @Parameter
+    private List<String> additionalArgs;
 
     /**
      * Convenience interface for plugins to add or replace artifacts and resources on projects.
@@ -774,6 +794,15 @@ public class JLinkMojo extends AbstractJLinkMojo {
             jlinkArgs.add(sb);
         }
 
+        if (generateCdsArchive) {
+            jlinkArgs.add("--generate-cds-archive");
+        }
+
+        if (orderResources != null && !orderResources.isEmpty()) {
+            String sb = String.join(",", orderResources);
+            jlinkArgs.add("--order-resources=" + sb);
+        }
+
         if (pluginModulePath != null) {
             jlinkArgs.add("--plugin-module-path");
             StringBuilder sb = convertSeparatedModulePathToPlatformSeparatedModulePath(pluginModulePath);
@@ -787,6 +816,10 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         if (verbose) {
             jlinkArgs.add("--verbose");
+        }
+
+        if (additionalArgs != null && !additionalArgs.isEmpty()) {
+            jlinkArgs.addAll(additionalArgs);
         }
 
         // NOTE: suggestProviders is a terminal JlinkTask, so must be at the end!
