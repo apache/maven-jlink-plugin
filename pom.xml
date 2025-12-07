@@ -37,7 +37,7 @@
   <inceptionYear>2016</inceptionYear>
 
   <prerequisites>
-    <maven>${mavenVersion}</maven>
+    <maven>3.6.3</maven>
   </prerequisites>
 
   <scm>
@@ -63,11 +63,12 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.6.3</mavenVersion>
+    <mavenVersion>3.9.11</mavenVersion>
     <maven.compiler.release>11</maven.compiler.release>
     <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
     <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
     <project.build.outputTimestamp>2024-01-29T19:21:50Z</project.build.outputTimestamp>
+    <version.palantirJavaFormat>2.82.0</version.palantirJavaFormat>
   </properties>
 
   <dependencyManagement>
@@ -135,13 +136,13 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.6.3</version>
+      <version>3.9.11</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>3.6.3</version>
+      <version>3.9.11</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
