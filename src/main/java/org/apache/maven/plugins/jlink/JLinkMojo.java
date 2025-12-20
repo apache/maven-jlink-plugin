@@ -71,7 +71,7 @@ import org.apache.maven.shared.filtering.MavenResourcesFiltering;
 import org.apache.maven.toolchain.Toolchain;
 import org.apache.maven.toolchain.ToolchainManager;
 import org.apache.maven.toolchain.ToolchainPrivate;
-import org.apache.maven.toolchain.java.DefaultJavaToolChain;
+import org.apache.maven.toolchain.java.JavaToolchainImpl;
 import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.languages.java.jpms.JavaModuleDescriptor;
@@ -522,9 +522,9 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
             Optional<Toolchain> toolchain = getToolchain();
             if (toolchain.isPresent()
-                    && toolchain.orElseThrow(NoSuchElementException::new) instanceof DefaultJavaToolChain) {
+                    && toolchain.orElseThrow(NoSuchElementException::new) instanceof JavaToolchainImpl) {
                 Toolchain toolchain1 = toolchain.orElseThrow(NoSuchElementException::new);
-                request.setJdkHome(new File(((DefaultJavaToolChain) toolchain1).getJavaHome()));
+                request.setJdkHome(new File(((JavaToolchainImpl) toolchain1).getJavaHome()));
             }
 
             ResolvePathsResult<File> resolvePathsResult = locationManager.resolvePaths(request);
