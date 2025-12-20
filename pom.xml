@@ -63,25 +63,14 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.9.11</mavenVersion>
+    <mavenVersion>3.9.12</mavenVersion>
     <maven.compiler.release>11</maven.compiler.release>
     <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
     <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
     <project.build.outputTimestamp>2024-01-29T19:21:50Z</project.build.outputTimestamp>
+    <version.maven-invoker-plugin>3.9.1</version.maven-invoker-plugin>
     <version.palantirJavaFormat>2.82.0</version.palantirJavaFormat>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>5.14.1</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -136,13 +125,13 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.9.12</version>
+      <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>3.9.12</version>
+      <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -211,7 +200,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>3.9.1</version>
       </plugin>
     </plugins>
   </reporting>
