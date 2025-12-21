@@ -30,12 +30,12 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class MultipleLauncherTest {
+class MultipleLauncherTest {
 
     private JLinkMojo mojo = new JLinkMojo(null, null, null, null);
 
     @Test
-    void testSingleLauncher() throws Exception {
+    void singleLauncher() throws Exception {
         // It's OK to specify one launcher with "<launcher>" given
         Field launcher = mojo.getClass().getDeclaredField("launcher");
         launcher.setAccessible(true);
@@ -49,7 +49,7 @@ public class MultipleLauncherTest {
     }
 
     @Test
-    void testOneMultipleLauncher() throws Exception {
+    void oneMultipleLauncher() throws Exception {
         // It's OK to specify one launcher with "<launchers>"
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
@@ -63,7 +63,7 @@ public class MultipleLauncherTest {
     }
 
     @Test
-    void testMultipleLaunchers() throws Exception {
+    void multipleLaunchers() throws Exception {
         // It's OK to specify multiple launchers with the "<launchers>" element
         Field launchers = mojo.getClass().getDeclaredField("launchers");
         launchers.setAccessible(true);
@@ -77,7 +77,7 @@ public class MultipleLauncherTest {
     }
 
     @Test
-    void testInvalidLauncherConfig() throws Exception {
+    void invalidLauncherConfig() throws Exception {
         // It's an error to specify both "<launcher>" and "<launchers>"
         Field launcher = mojo.getClass().getDeclaredField("launcher");
         launcher.setAccessible(true);
