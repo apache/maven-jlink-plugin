@@ -335,6 +335,14 @@ public class JLinkMojo extends AbstractJLinkMojo {
     private File sourceJdkModules;
 
     /**
+     * Controls whether the plugin tries to attach the resulting artifact to the project.
+     *
+     * @since 3.2.1
+     */
+    @Parameter(defaultValue = "true")
+    private boolean attach;
+
+    /**
      * Classifier to add to the artifact generated. If given, the artifact will be attached
      * as a supplemental artifact.
      * If not given, this will create the main artifact which is the default behavior.
@@ -466,15 +474,7 @@ public class JLinkMojo extends AbstractJLinkMojo {
 
         File createZipArchiveFromImage = createZipArchiveFromImage(buildDirectory, outputDirectoryImage);
 
-        if (hasClassifier()) {
-            projectHelper.attachArtifact(getProject(), "jlink", getClassifier(), createZipArchiveFromImage);
-        } else {
-            if (projectHasAlreadySetAnArtifact()) {
-                throw new MojoExecutionException("You have to use a classifier "
-                        + "to attach supplemental artifacts to the project instead of replacing them.");
-            }
-            getProject().getArtifact().setFile(createZipArchiveFromImage);
-        }
+        attachArtifactUnlessDisabled(createZipArchiveFromImage);
     }
 
     /**
@@ -628,6 +628,22 @@ public class JLinkMojo extends AbstractJLinkMojo {
         }
 
         return resultArchive;
+    }
+
+    private void attachArtifactUnlessDisabled(File artifactFile) throws MojoExecutionException {
+        if (!attach) {
+            return;
+        }
+
+        if (hasClassifier()) {
+            projectHelper.attachArtifact(getProject(), "jlink", getClassifier(), artifactFile);
+        } else {
+            if (projectHasAlreadySetAnArtifact()) {
+                throw new MojoExecutionException("You have to use a classifier "
+                        + "to attach supplemental artifacts to the project instead of replacing them.");
+            }
+            getProject().getArtifact().setFile(artifactFile);
+        }
     }
 
     private void failIfParametersAreNotInTheirValidValueRanges() throws MojoFailureException {
