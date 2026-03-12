@@ -63,7 +63,7 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>3.9.13</mavenVersion>
+    <mavenVersion>3.9.14</mavenVersion>
     <maven.compiler.release>11</maven.compiler.release>
     <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
     <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
