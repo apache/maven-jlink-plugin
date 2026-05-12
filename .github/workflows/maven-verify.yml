@@ -28,3 +28,8 @@ jobs:
     with:
       maven4-enabled: 'true'
       jdk-distribution-matrix: '[ "temurin", "semeru"]'
+      matrix-exclude: '
+        [
+          {"jdk": "8"}
+        ]'
+
