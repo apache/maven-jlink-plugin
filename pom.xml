@@ -64,12 +64,8 @@
 
   <properties>
     <mavenVersion>3.9.16</mavenVersion>
-    <maven.compiler.release>11</maven.compiler.release>
-    <!-- needed for enforce-bytecode-version in maven-parent-pom. -->
-    <maven.compiler.target>${maven.compiler.release}</maven.compiler.target>
+    <javaVersion>11</javaVersion>
     <project.build.outputTimestamp>2026-03-09T18:54:07Z</project.build.outputTimestamp>
-    <version.maven-invoker-plugin>3.9.1</version.maven-invoker-plugin>
-    <version.palantirJavaFormat>2.82.0</version.palantirJavaFormat>
   </properties>
 
   <dependencies>
@@ -257,7 +253,6 @@
               <filterProperties>
                 <mrm.repository.url>${mrm.repository.url}</mrm.repository.url>
               </filterProperties>
-              <streamLogsOnFailures>true</streamLogsOnFailures>
               <goals>
                 <goal>clean</goal>
                 <goal>package</goal>
