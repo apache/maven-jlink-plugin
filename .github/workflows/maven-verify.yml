@@ -23,6 +23,8 @@ on:
 
 jobs:
   build:
+    with:
+        maven4-enabled: true
 
     strategy:
       matrix:
