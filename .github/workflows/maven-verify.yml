@@ -15,11 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Verify
+name: Java CI
 
-on:
-  push:
-  pull_request:
+on: [ push, pull_request ]
 
 jobs:
   build:
