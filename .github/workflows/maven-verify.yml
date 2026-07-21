@@ -21,6 +21,8 @@ on: [ push, pull_request ]
 
 jobs:
   build:
+    with:
+        maven4-enabled: true
 
     strategy:
       matrix:
