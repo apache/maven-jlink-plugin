@@ -20,16 +20,11 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-    time: '04:00'
-  open-pull-requests-limit: 10
   ignore:
-    # Ignore Maven 3.2.1+
-    - dependency-name: org.apache.maven.plugin-testing:maven-plugin-testing-tools
-      versions:
-        - ">=3.2.0"
-    - dependency-name: org.apache.maven.plugin-testing:maven-plugin-testing-harness
-      versions:
-        - ">=3.2.0"
+    # mrm-maven-plugin 2.x requires Java 17
+    - dependency-name: org.codehaus.mojo:mrm-maven-plugin
+      versions: [">= 2.0.0"]
+
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:

@@ -43,16 +43,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JLinkMojoTest {
+@ExtendWith(MockitoExtension.class)
+class JLinkMojoTest {
 
     private JLinkMojo mojo;
 
@@ -69,8 +72,7 @@ public class JLinkMojoTest {
     private LocationManager locationManager;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        MockitoAnnotations.openMocks(this);
+    void setUp() throws Exception {
         mojo = new JLinkMojo(projectHelper, toolchainManager, mavenResourcesFiltering, locationManager);
         Field stripDebug = mojo.getClass().getDeclaredField("stripDebug");
         stripDebug.setAccessible(true);
@@ -149,7 +151,7 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void testGetModulePathElements() throws Exception {
+    void getModulePathElements() throws Exception {
         File outputDirectory = new File("target/test-classes");
         outputDirectory.mkdirs();
 
@@ -157,7 +159,7 @@ public class JLinkMojoTest {
         Artifact artifact = mock(Artifact.class);
         when(artifact.getFile()).thenReturn(new File("target/test-classes/dependency.jar"));
         when(project.getArtifacts()).thenReturn(Collections.singleton(artifact));
-        when(project.getBasedir()).thenReturn(new File("."));
+        lenient().when(project.getBasedir()).thenReturn(new File("."));
 
         JavaModuleDescriptor moduleDescriptor = mock(JavaModuleDescriptor.class);
         when(moduleDescriptor.name()).thenReturn("test.module");
@@ -184,7 +186,7 @@ public class JLinkMojoTest {
     }
 
     @Test
-    void testIgnoreAutomaticModules() throws Exception {
+    void ignoreAutomaticModules() throws Exception {
         File outputDirectory = new File("target/test-classes");
         outputDirectory.mkdirs();
 
@@ -195,7 +197,7 @@ public class JLinkMojoTest {
         when(artifact2.getFile()).thenReturn(new File("target/test-classes/dependency2.jar"));
 
         when(project.getArtifacts()).thenReturn(Set.of(artifact1, artifact2));
-        when(project.getBasedir()).thenReturn(new File("."));
+        lenient().when(project.getBasedir()).thenReturn(new File("."));
 
         JavaModuleDescriptor moduleDescriptor1 = mock(JavaModuleDescriptor.class);
         when(moduleDescriptor1.name()).thenReturn("valid.module");

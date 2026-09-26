@@ -52,32 +52,32 @@ import static org.mockito.Mockito.when;
 /**
  * @author Karl Heinz Marbaise <a href="mailto:khmarbaise@apache.org">khmarbaise@apache.org</a>
  */
-public class AbstractJLinkMojoTest {
+class AbstractJLinkMojoTest {
     private AbstractJLinkMojo mojoMock;
 
     @BeforeEach
-    public void before() {
+    void before() {
         this.mojoMock = mock(AbstractJLinkMojo.class, Mockito.CALLS_REAL_METHODS);
         when(mojoMock.getLog()).thenReturn(mock(Log.class));
     }
 
     @Test
     @DisplayName("convert should return single characters")
-    public void convertShouldReturnSingleCharacter() {
+    void convertShouldReturnSingleCharacter() {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath("x");
         assertThat(result).isNotEmpty().hasToString("x");
     }
 
     @Test
     @DisplayName("convert should two characters separated by path separator")
-    public void convertShouldReturnTwoCharactersSeparatedByPathSeparator() {
+    void convertShouldReturnTwoCharactersSeparatedByPathSeparator() {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath("x;a");
         assertThat(result).hasToString("x" + File.pathSeparatorChar + "a");
     }
 
     @Test
     @DisplayName("convert using differential delimiter should return two characters separated by path separator")
-    public void convertUsingDifferentDelimiterShouldReturnTwoCharactersSeparatedByPathSeparator() {
+    void convertUsingDifferentDelimiterShouldReturnTwoCharactersSeparatedByPathSeparator() {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath("x:a");
         assertThat(result).hasToString("x" + File.pathSeparatorChar + "a");
     }
@@ -85,7 +85,7 @@ public class AbstractJLinkMojoTest {
     @Test
     @DisplayName("convertSeparatedModulePathToPlatformSeparatedModulePath() "
             + "should return two characters separated by path separator")
-    public void convertUsingMultipleDelimitersShouldReturnTwoCharactersSeparatedByPathSeparator() {
+    void convertUsingMultipleDelimitersShouldReturnTwoCharactersSeparatedByPathSeparator() {
         StringBuilder result = mojoMock.convertSeparatedModulePathToPlatformSeparatedModulePath("x:a::");
         assertThat(result).hasToString("x" + File.pathSeparatorChar + "a");
     }
