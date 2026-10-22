@@ -48,6 +48,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.shared.utils.cli.CommandLineException;
 import org.apache.maven.shared.utils.cli.CommandLineUtils;
 import org.apache.maven.shared.utils.cli.Commandline;
+import org.apache.maven.shared.utils.cli.shell.Shell;
 import org.apache.maven.toolchain.Toolchain;
 
 abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
@@ -98,14 +99,25 @@ abstract class AbstractJLinkToolchainExecutor extends AbstractJLinkExecutor {
     }
 
     static Commandline createJLinkCommandLine(File jlinkExecutable, List<String> jlinkArgs) {
-        Commandline cmd = new Commandline();
+        Commandline cmd = isOSWindows()
+                ? new Commandline(new Shell() {
+                    @Override
+                    public List<String> getShellCommandLine(String... arguments) {
+                        return List.of("cmd.exe", "/X", "/C", getExecutable());
+                    }
+                })
+                : new Commandline();
         // Don't quote every argument with single quote, but instead quote them with double quotes
         // and enclose all of them with single quotes to then be passed to the shell command as
         // /bin/sh -c '<all arguments, each one quoted with double quotes>'
         cmd.getShell().setQuotedArgumentsEnabled(false);
 
         String jlinkArgsStr = jlinkArgs.stream().map(arg -> "\"" + arg + "\"").collect(Collectors.joining(" "));
-        cmd.setExecutable(jlinkExecutable.getAbsolutePath() + " " + jlinkArgsStr);
+        String executable = jlinkExecutable.getAbsolutePath();
+        if (isOSWindows()) {
+            executable = "\"" + executable + "\"";
+        }
+        cmd.setExecutable(executable + " " + jlinkArgsStr);
         return cmd;
     }
 
