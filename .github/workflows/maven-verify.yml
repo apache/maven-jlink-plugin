@@ -15,38 +15,23 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Java CI
+name: Verify
 
-on: [ push, pull_request ]
+on:
+  push:
+  pull_request:
 
 jobs:
   build:
+    name: Verify
+    uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v5
     with:
-        maven4-enabled: true
-
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest, macOS-latest ]
-        java: [ 11, 17, 21 ]
-        dist: [ 'temurin', 'semeru' ]
-        exclude:
-        - os: macos-latest
-          dist: 'semeru'
-
-      fail-fast: false
-
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Set up JDK
-        uses: actions/setup-java@v6.1.0
-        with:
-          distribution: ${{ matrix.dist }}
-          java-version: ${{ matrix.java }}
-          cache: 'maven'
-
-      - name: Build with Maven
-        run: mvn verify --errors --batch-mode --show-version -Prun-its
+      maven4-enabled: true
+      # JDK 11 is the plugin's floor; Temurin 25 and later ship no jmods, which jlink needs (#675)
+      jdk-matrix: '[ "11", "17", "21" ]'
+      jdk-distribution-matrix: '[ "temurin", "semeru" ]'
+      matrix-exclude: '[ { "os": "macos-latest", "distribution": "semeru" } ]'
+      ff-jdk-distribution: 'temurin'
+      # the default toolchain set includes JDK 25; the build needs no toolchains
+      ff-jdk-toolchain: ''
+      jdk-toolchain: ''
