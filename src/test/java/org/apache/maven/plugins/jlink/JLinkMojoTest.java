@@ -110,6 +110,7 @@ class JLinkMojoTest {
 
         // then
         assertThat(cmdLine.toString()).startsWith("cmd.exe ");
+        assertThat(cmdLine.toString()).doesNotContain("/C \"\"");
         assertThat(cmdLine.toString())
                 .contains(
                         "\\path\\to\\jlink \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink");
