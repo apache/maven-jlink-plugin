@@ -44,6 +44,7 @@ import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,6 +55,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Isolated("Temporarily changes os.name for Windows command construction")
 @ExtendWith(MockitoExtension.class)
 class JLinkMojoTest {
 
@@ -106,13 +108,44 @@ class JLinkMojoTest {
     void singleQuotesShellCommandWindows() throws Exception {
         // when
         List<String> jlinkArgs = mojo.createJlinkArgs(List.of("foo", "bar"), List.of("mvn", "jlink"));
-        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(new File("/path/to/jlink"), jlinkArgs);
+        File executable = new File("/path/to/jlink");
+        Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(executable, jlinkArgs);
 
         // then
         assertThat(cmdLine.toString()).startsWith("cmd.exe ");
-        assertThat(cmdLine.toString())
-                .contains(
-                        "\\path\\to\\jlink \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink");
+        assertThat(cmdLine.toString()).doesNotContain("/C \"\"");
+        assertThat(cmdLine.getShell().getShellCommandLine(cmdLine.getArguments()))
+                .containsExactly(
+                        "cmd.exe",
+                        "/X",
+                        "/C",
+                        "\"" + executable.getAbsolutePath()
+                                + "\" \"--strip-debug\" \"--module-path\" \"foo;bar\" \"--add-modules\" \"mvn,jlink\"");
+    }
+
+    @Test
+    void windowsCommandConstructionPreservesPathsWithSpaces() {
+        String originalOsName = System.getProperty("os.name");
+        try {
+            System.setProperty("os.name", "Windows 11");
+            File executable = new File("Program Files/jdk/bin/jlink.exe");
+            Commandline cmdLine = JLinkExecutor.createJLinkCommandLine(
+                    executable, List.of("--module-path", "module path;other path", "--add-modules", "mvn,jlink"));
+
+            assertThat(cmdLine.getShell().getShellCommandLine(cmdLine.getArguments()))
+                    .containsExactly(
+                            "cmd.exe",
+                            "/X",
+                            "/C",
+                            "\"" + executable.getAbsolutePath()
+                                    + "\" \"--module-path\" \"module path;other path\" \"--add-modules\" \"mvn,jlink\"");
+        } finally {
+            if (originalOsName == null) {
+                System.clearProperty("os.name");
+            } else {
+                System.setProperty("os.name", originalOsName);
+            }
+        }
     }
 
     @Test
