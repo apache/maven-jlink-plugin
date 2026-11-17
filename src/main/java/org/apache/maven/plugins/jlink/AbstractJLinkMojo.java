@@ -92,7 +92,7 @@ public abstract class AbstractJLinkMojo extends AbstractMojo {
         if (jdkToolchain != null) {
             List<Toolchain> tcs = toolchainManager.getToolchains(getSession(), "jdk", jdkToolchain);
 
-            if (tcs != null && tcs.size() > 0) {
+            if (tcs != null && !tcs.isEmpty()) {
                 tc = tcs.get(0);
             }
         }
