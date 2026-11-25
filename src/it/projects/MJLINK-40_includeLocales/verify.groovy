@@ -17,8 +17,6 @@
  * under the License.
  */
 
-import java.util.jar.*;
-
 File buildLog = new File( basedir, "build.log" )
 assert buildLog.exists() && !buildLog.isDirectory() : "build.log file is missing or is a directory."
 
