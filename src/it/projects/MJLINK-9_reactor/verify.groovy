@@ -18,8 +18,6 @@
  * under the License.
  */
 
-import java.util.jar.*
-
 File target = new File( basedir, "app/target" )
 assert target.isDirectory()
 

@@ -18,8 +18,6 @@
  * under the License.
  */
 
-import java.util.jar.*
-
 String buildlog = new File( basedir, "build.log").text
 assert buildlog.contains( "--add-options=-Xmx128m --enable-preview -Dvar=value" )
 assert buildlog.contains( "addOptions = [-Xmx128m, --enable-preview, -Dvar=value]" )

@@ -18,8 +18,6 @@
  * under the License.
  */
 
-import java.util.jar.*;
-
 File target = new File( basedir, "target" )
 assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
 File primaryArtifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0.jar" )
