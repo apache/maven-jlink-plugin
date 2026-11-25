@@ -18,8 +18,6 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
 import java.util.jar.*
 import org.codehaus.plexus.util.*
 
