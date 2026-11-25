@@ -23,8 +23,8 @@ import java.util.*
 import java.util.jar.*
 import org.codehaus.plexus.util.*
 
-String buildlog = new File( basedir, "build.log").text
-assert buildlog.contains( "org.apache.maven.plugin.MojoFailureException" )
-assert buildlog.contains( "needs at least a Java 14" )
+String buildlog = new File(basedir, "build.log").text
+assert buildlog.contains("org.apache.maven.plugin.MojoFailureException")
+assert buildlog.contains("needs at least a Java 14")
 
 

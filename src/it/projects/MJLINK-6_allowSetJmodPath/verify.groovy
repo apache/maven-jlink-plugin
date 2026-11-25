@@ -18,8 +18,8 @@
  * under the License.
  */
 
-File target = new File( basedir, "target" );
+File target = new File(basedir, "target")
 assert target.isDirectory()
 
-File artifact = new File( target, "maven-jlink-plugin-mjlink-6-96.0.zip" );
+File artifact = new File(target, "maven-jlink-plugin-mjlink-6-96.0.zip")
 assert artifact.isFile()

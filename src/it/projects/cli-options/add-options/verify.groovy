@@ -18,12 +18,12 @@
  * under the License.
  */
 
-String buildlog = new File( basedir, "build.log").text
-assert buildlog.contains( "--add-options=-Xmx128m --enable-preview -Dvar=value" )
-assert buildlog.contains( "addOptions = [-Xmx128m, --enable-preview, -Dvar=value]" )
+String buildlog = new File(basedir, "build.log").text
+assert buildlog.contains("--add-options=-Xmx128m --enable-preview -Dvar=value")
+assert buildlog.contains("addOptions = [-Xmx128m, --enable-preview, -Dvar=value]")
 
-File target = new File( basedir, "target" )
+File target = new File(basedir, "target")
 assert target.isDirectory()
 
-File artifact = new File( target, "maven-jlink-plugin-cli-options-add-options-101.0.zip" )
+File artifact = new File(target, "maven-jlink-plugin-cli-options-add-options-101.0.zip")
 assert artifact.isFile()

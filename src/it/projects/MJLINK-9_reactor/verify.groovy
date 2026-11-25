@@ -18,16 +18,16 @@
  * under the License.
  */
 
-File target = new File( basedir, "app/target" )
+File target = new File(basedir, "app/target")
 assert target.isDirectory()
 
-File jarArtifact = new File( target, "maven-jlink-plugin-mjlink-9-app-96.0.jar" )
+File jarArtifact = new File(target, "maven-jlink-plugin-mjlink-9-app-96.0.jar")
 assert jarArtifact.isFile()
 
-File distTarget = new File( basedir, "dist/target" )
+File distTarget = new File(basedir, "dist/target")
 assert distTarget.isDirectory()
 
-File artifact = new File( distTarget, "maven-jlink-plugin-mjlink-9-dist-96.0.zip" )
+File artifact = new File(distTarget, "maven-jlink-plugin-mjlink-9-dist-96.0.zip")
 assert artifact.isFile()
 
 // optional: check if it contains a launcher script
