@@ -17,13 +17,12 @@
  * under the License.
  */
 
-File buildLog = new File( basedir, "build.log" )
+File buildLog = new File(basedir, "build.log")
 assert buildLog.exists() && !buildLog.isDirectory() : "build.log file is missing or is a directory."
 
 boolean result = false
 buildLog.eachLine { line ->
-    if (line.contains('--include-locales, en,ja,de,*-IN'))
-    {
+    if (line.contains('--include-locales, en,ja,de,*-IN')) {
         result = true
     }
 }

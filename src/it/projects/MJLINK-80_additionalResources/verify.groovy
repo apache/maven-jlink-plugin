@@ -18,10 +18,10 @@
  * under the License.
  */
 
-import java.util.zip.*;
+import java.util.zip.*
 
-assert new File( basedir, 'target/maven-jlink/default/README.md' ).exists()
+assert new File(basedir, 'target/maven-jlink/default/README.md').exists()
 
-def file = new File( basedir, 'target/maven-jlink-plugin-mjlink-80-42.0.0.zip')
+def file = new File(basedir, 'target/maven-jlink-plugin-mjlink-80-42.0.0.zip')
 
 assert new ZipFile(file).getEntry('README.md')
