@@ -17,32 +17,16 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-boolean result = false;
+File buildLog = new File( basedir, "build.log" )
+assert buildLog.exists() && !buildLog.isDirectory() : "build.log file is missing or is a directory."
 
-try
-{
-    File buildLog = new File( basedir, "build.log" );
-    if ( !buildLog.exists() || buildLog.isDirectory() )
+boolean result = false
+buildLog.eachLine { line ->
+    if (line.contains('--include-locales, en,ja,de,*-IN'))
     {
-        System.err.println( "build.log file is missing or is a directory." );
-        return false;
-    }
-
-    def line = buildLog.eachLine { line ->
-        if (line.contains('--include-locales, en,ja,de,*-IN'))
-        {
-            result = true;
-        }
+        result = true
     }
 }
-catch( Throwable e )
-{
-    e.printStackTrace();
-}
-
-return result;
+assert result

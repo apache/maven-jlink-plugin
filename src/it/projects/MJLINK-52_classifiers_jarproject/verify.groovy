@@ -18,38 +18,11 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-try
-{
-    File target = new File( basedir, "target" )
-    if ( !target.exists() || !target.isDirectory() )
-    {
-        System.err.println( "target file is missing or not a directory." )
-        return false
-    }
-
-    File primaryArtifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0.jar" )
-    if ( !primaryArtifact.exists() || primaryArtifact.isDirectory() )
-    {
-        System.err.println( "maven-jlink-plugin-mjlink-52-96.0.jar file is missing or is a directory." )
-        return false
-    }
-
-    File jlinkArtifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0-jlink.zip" )
-    if ( !jlinkArtifact.exists() || jlinkArtifact.isDirectory() )
-    {
-        System.err.println( "maven-jlink-plugin-mjlink-52-96.0-jlink.zip file is missing or is a directory." )
-        return false
-    }
-
-    return true
-}
-catch( Throwable e )
-{
-    e.printStackTrace()
-    return false
-}
+File target = new File( basedir, "target" )
+assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
+File primaryArtifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0.jar" )
+assert primaryArtifact.exists() && !primaryArtifact.isDirectory() : "maven-jlink-plugin-mjlink-52-96.0.jar file is missing or is a directory."
+File jlinkArtifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0-jlink.zip" )
+assert jlinkArtifact.exists() && !jlinkArtifact.isDirectory() : "maven-jlink-plugin-mjlink-52-96.0-jlink.zip file is missing or is a directory."

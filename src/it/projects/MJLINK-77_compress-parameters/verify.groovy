@@ -18,45 +18,18 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-boolean result = true;
+File target = new File( basedir, "target" )
+assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
+File artifact = new File( target, "maven-jlink-plugin-mjlink-77-96.0.zip" )
+assert artifact.exists() && !artifact.isDirectory() : "maven-jlink-plugin-mjlink-77-96.0.zip file is missing or is a directory."
 
-try
-{
-    File target = new File( basedir, "target" );
-    if ( !target.exists() || !target.isDirectory() )
-    {
-        System.err.println( "target file is missing or not a directory." );
-        return false;
+def buildLog = new File(basedir, "build.log")
+def found = false
+buildLog.eachLine{line ->
+    if (line.contains("--compress, zip-1")) {
+        found = true
     }
-    File artifact = new File( target, "maven-jlink-plugin-mjlink-77-96.0.zip" );
-    if ( !artifact.exists() || artifact.isDirectory() )
-    {
-        System.err.println( "maven-jlink-plugin-mjlink-77-96.0.zip file is missing or is a directory." );
-        return false;
-    }
-
-    def buildLog = new File(basedir, "build.log")
-    def found = false
-    buildLog.eachLine{line ->
-        if (line.contains("--compress, zip-1")) {
-            found = true
-        }
-    }
-    if (!found) {
-        System.err.println( "Not found in build.log: '--compress, zip-1'." )
-        return false
-    }
-
 }
-catch( Throwable e )
-{
-    e.printStackTrace();
-    result = false;
-}
-
-return result;
+assert found : "Not found in build.log: '--compress, zip-1'."

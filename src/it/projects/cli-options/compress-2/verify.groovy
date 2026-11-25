@@ -18,33 +18,9 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-boolean result = true;
-
-try
-{
-    File target = new File( basedir, "target" );
-    if ( !target.exists() || !target.isDirectory() )
-    {
-        System.err.println( "target file is missing or not a directory." );
-        return false;
-    }
-    File artifact = new File( target, "maven-jlink-plugin-cli-options-compress2-99.0.zip" );
-    if ( !artifact.exists() || artifact.isDirectory() )
-    {
-        System.err.println( "maven-jlink-plugin-cli-options-compress2-99.0.zip file is missing or is a directory." );
-        return false;
-    }
-
-}
-catch( Throwable e )
-{
-    e.printStackTrace();
-    result = false;
-}
-
-return result;
+File target = new File( basedir, "target" )
+assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
+File artifact = new File( target, "maven-jlink-plugin-cli-options-compress2-99.0.zip" )
+assert artifact.exists() && !artifact.isDirectory() : "maven-jlink-plugin-cli-options-compress2-99.0.zip file is missing or is a directory."
