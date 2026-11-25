@@ -18,10 +18,7 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
 import java.util.jar.*
-import org.codehaus.plexus.util.*
 
 String buildlog = new File( basedir, "build.log").text
 assert buildlog.contains( "--add-options=-Xmx128m --enable-preview -Dvar=value" )

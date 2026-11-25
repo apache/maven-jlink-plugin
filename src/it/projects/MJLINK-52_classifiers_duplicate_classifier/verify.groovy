@@ -18,30 +18,9 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-try
-{
-    File target = new File( basedir, "target" );
-    if ( !target.exists() || !target.isDirectory() )
-    {
-        System.err.println( "target file is missing or not a directory." );
-        return false;
-    }
-    File artifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0-jlink1.zip" );
-    if ( !artifact.exists() || artifact.isDirectory() )
-    {
-        System.err.println( "maven-jlink-plugin-mjlink-52-96.0-jlink1.zip file is missing or is a directory." );
-        return false;
-    }
-
-    return true;
-}
-catch( Throwable e )
-{
-    e.printStackTrace();
-    return false;
-}
+File target = new File( basedir, "target" )
+assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
+File artifact = new File( target, "maven-jlink-plugin-mjlink-52-96.0-jlink1.zip" )
+assert artifact.exists() && !artifact.isDirectory() : "maven-jlink-plugin-mjlink-52-96.0-jlink1.zip file is missing or is a directory."

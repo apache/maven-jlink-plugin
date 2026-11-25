@@ -18,10 +18,7 @@
  * under the License.
  */
 
-import java.io.*
-import java.util.*
 import java.util.jar.*
-import org.codehaus.plexus.util.*
 
 File target = new File( basedir, "app/target" )
 assert target.isDirectory()

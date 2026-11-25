@@ -18,75 +18,36 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.jar.*;
-import org.codehaus.plexus.util.*;
 
-try {
-    File target = new File( basedir, "target" )
-    if ( !target.exists() || !target.isDirectory() ) {
-        System.err.println( "target file is missing or not a directory." )
-        return false
-    }
+File target = new File( basedir, "target" )
+assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
 
-    // Check script variable was passed correctly from parent POM
-    if (!binding.hasVariable('localRepoStr') || localRepoStr == null || localRepoStr.isEmpty()) {
-        System.err.println("localRepoStr script variable not set or null.")
-        return false
-    }
+// Check script variable was passed correctly from parent POM
+assert binding.hasVariable('localRepoStr') && localRepoStr != null && !localRepoStr.isEmpty() : "localRepoStr script variable not set or null."
 
-    // Get local repository path from script variable and validate it exists
-    File localRepo = new File(localRepoStr)
-    System.out.println("[INFO] localRepo set to: " + localRepo.getAbsolutePath())
+// Get local repository path from script variable and validate it exists
+File localRepo = new File(localRepoStr)
+System.out.println("[INFO] localRepo set to: " + localRepo.getAbsolutePath())
 
-    if ( !localRepo.exists() || !localRepo.isDirectory() ) {
-        System.err.println("localRepo not set to a valid directory.")
-        return false
-    }
+assert localRepo.exists() && localRepo.isDirectory() : "localRepo not set to a valid directory."
 
+// Check that output artifacts have been created
+File artifact1 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip" )
+assert artifact1.exists() && !artifact1.isDirectory() : "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip file is missing or is a directory."
 
-    // Check that output artifacts have been created
-    File artifact1 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip" )
-    if ( !artifact1.exists() || artifact1.isDirectory() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip file is missing or is a directory." )
-        return false
-    }
+File artifact2 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0.zip" )
+assert artifact2.exists() && !artifact2.isDirectory() : "maven-jlink-plugin-it-attach-skip-1.0.zip file is missing or is a directory."
 
-    File artifact2 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0.zip" )
-    if ( !artifact2.exists() || artifact2.isDirectory() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0.zip file is missing or is a directory." )
-        return false
-    }
+File artifact3 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip" )
+assert artifact3.exists() && !artifact3.isDirectory() : "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip file is missing or is a directory."
 
-    File artifact3 = new File( target, "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip" )
-    if ( !artifact3.exists() || artifact3.isDirectory() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip file is missing or is a directory." )
-        return false
-    }
+// Check that the artifacts' installation status is as expected based on the attach parameter
+installedArtifact1 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip" )
+assert !installedArtifact1.exists() : "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip WAS installed when attach parameter set to FALSE."
 
+installedArtifact2 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0.zip" )
+assert !installedArtifact2.exists() : "maven-jlink-plugin-it-attach-skip-1.0.zip WAS installed when attach parameter set to FALSE."
 
-    // Check that the artifacts' installation status is as expected based on the attach parameter
-    installedArtifact1 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip" )
-    if ( installedArtifact1.exists() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0-jlink1.zip WAS installed when attach parameter set to FALSE." )
-        return false
-    }
-
-    installedArtifact2 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0.zip" )
-    if ( installedArtifact2.exists() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0.zip WAS installed when attach parameter set to FALSE." )
-        return false
-    }
-
-    installedArtifact3 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip" )
-    if ( !installedArtifact3.exists() ) {
-        System.err.println( "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip NOT installed when attach parameter set to TRUE." )
-        return false
-    }
-
-    return true
-} catch( Throwable e ) {
-    e.printStackTrace()
-    return false
-}
+installedArtifact3 = new File( localRepo, "org/apache/maven/plugins/maven-jlink-plugin-it-attach-skip/1.0/maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip" )
+assert installedArtifact3.exists() : "maven-jlink-plugin-it-attach-skip-1.0-jlink3.zip NOT installed when attach parameter set to TRUE."

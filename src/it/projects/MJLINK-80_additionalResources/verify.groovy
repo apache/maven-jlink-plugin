@@ -18,8 +18,6 @@
  * under the License.
  */
 
-import java.io.*;
-import java.util.*;
 import java.util.zip.*;
 
 assert new File( basedir, 'target/maven-jlink/default/README.md' ).exists()
