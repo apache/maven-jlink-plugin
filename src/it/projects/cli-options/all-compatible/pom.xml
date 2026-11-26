@@ -23,12 +23,12 @@
 >
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-jlink-plugin-cli-options-endian-big</artifactId>
+  <artifactId>maven-jlink-plugin-cli-options-all-compatible</artifactId>
   <version>99.0</version>
   <packaging>jlink</packaging>
   <name>Maven</name>
   <url>http://maven.apache.org</url>
-  <description>Test JLink CLI Options --endian big.</description>
+  <description>Test JLink accepts every CLI option that can be combined (see the unit tests for how each one maps to an argument).</description>
   <properties>
     <maven.compiler.source>1.9</maven.compiler.source>
     <maven.compiler.target>1.9</maven.compiler.target>
@@ -58,7 +58,21 @@
         <version>@project.version@</version>
         <extensions>true</extensions>
         <configuration>
+          <stripDebug>true</stripDebug>
+          <bindServices>true</bindServices>
           <endian>big</endian>
+          <ignoreSigningInformation>true</ignoreSigningInformation>
+          <compress>2</compress>
+          <noHeaderFiles>true</noHeaderFiles>
+          <noManPages>true</noManPages>
+          <verbose>true</verbose>
+          <includeLocales>
+            <includeLocale>en</includeLocale>
+            <includeLocale>ja</includeLocale>
+            <includeLocale>de</includeLocale>
+            <includeLocale>*-IN</includeLocale>
+          </includeLocales>
+          <sourceJdkModules>${java.home}</sourceJdkModules>
         </configuration>
       </plugin>
     </plugins>

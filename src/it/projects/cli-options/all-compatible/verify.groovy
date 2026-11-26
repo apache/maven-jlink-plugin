@@ -20,5 +20,5 @@
 
 File target = new File(basedir, "target")
 assert target.exists() && target.isDirectory() : "target file is missing or not a directory."
-File artifact = new File( target, "maven-jlink-plugin-cli-options-ignore-signing-information-99.0.zip" )
-assert artifact.exists() && !artifact.isDirectory() : "maven-jlink-plugin-cli-options-ignore-signing-information-99.0.zip file is missing or is a directory."
+File artifact = new File( target, "maven-jlink-plugin-cli-options-all-compatible-99.0.zip" )
+assert artifact.exists() && !artifact.isDirectory() : "maven-jlink-plugin-cli-options-all-compatible-99.0.zip file is missing or is a directory."
